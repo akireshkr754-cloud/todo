@@ -179,6 +179,54 @@
             resize: vertical;
         }
 
+        .file-upload {
+            border: 2px dashed #e0e0e0;
+            border-radius: 10px;
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: border-color 0.3s;
+        }
+
+        .file-upload:hover {
+            border-color: #667eea;
+        }
+
+        .file-upload input {
+            display: none;
+        }
+
+        .file-upload-label {
+            color: #667eea;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .file-preview {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .file-preview-item {
+            background: #f0f0f0;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .file-preview-item button {
+            background: none;
+            border: none;
+            color: #999;
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+
         /* Progress Bar */
         .progress-container {
             margin: 2rem 0;
@@ -239,7 +287,7 @@
         /* Frames */
         .frames-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 1.5rem;
         }
 
@@ -256,10 +304,15 @@
         }
 
         .frame-preview {
-            height: 150px;
+            height: 180px;
             background: linear-gradient(135deg, #667eea20, #764ba220);
             position: relative;
             overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #667eea;
+            font-size: 3rem;
         }
 
         .frame-content {
@@ -270,18 +323,23 @@
             font-weight: bold;
             margin-bottom: 0.5rem;
             color: #333;
+            font-size: 1.1rem;
         }
 
         .frame-meta {
             font-size: 0.875rem;
             color: #666;
             margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
 
         .frame-tags {
             display: flex;
             flex-wrap: wrap;
             gap: 0.5rem;
+            margin-top: 1rem;
         }
 
         .tag {
@@ -337,6 +395,19 @@
             font-size: 0.875rem;
             overflow-x: auto;
             white-space: pre-wrap;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        /* Optional Field Indicator */
+        .optional-badge {
+            display: inline-block;
+            background: #f0f0f0;
+            color: #999;
+            font-size: 0.75rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            margin-left: 0.5rem;
         }
 
         /* Responsive */
@@ -406,18 +477,18 @@
             <div class="container">
                 <div class="card">
                     <h1 class="card-header">AI Storyboard Workflow System</h1>
-                    <p style="font-size: 1.125rem; color: #666; margin-bottom: 2rem;">Transform your script and screenshots into a complete Figma-ready storyboard with AI-powered analysis, music matching, and motion notes.</p>
+                    <p style="font-size: 1.125rem; color: #666; margin-bottom: 2rem;">Transform your script into a complete Figma-ready storyboard with AI-powered analysis, music matching, and motion notes. Screenshots and Pinterest references are optional!</p>
                     
                     <div class="grid">
                         <div class="card" style="margin: 0;">
                             <h3 style="margin-bottom: 1rem;">🎬 Input</h3>
-                            <p style="color: #666; margin-bottom: 1.5rem;">Paste your script, upload screenshots, and add a Pinterest board URL for style references.</p>
+                            <p style="color: #666; margin-bottom: 1.5rem;">Paste your script. Optionally upload screenshots and add a Pinterest reference link for style inspiration.</p>
                             <button class="btn" onclick="changePage('input')">Start New Project →</button>
                         </div>
                         
                         <div class="card" style="margin: 0;">
                             <h3 style="margin-bottom: 1rem;">🤖 AI Processing</h3>
-                            <p style="color: #666; margin-bottom: 1.5rem;">Claude AI analyzes emotion, style, and generates complete storyboard with music.</p>
+                            <p style="color: #666; margin-bottom: 1.5rem;">Claude AI analyzes emotion, style, and generates complete storyboard with matched music.</p>
                             <button class="btn btn-secondary" onclick="changePage('workflow')">View Workflow →</button>
                         </div>
                         
@@ -464,7 +535,7 @@
                                     <span style="background: #667eea20; color: #667eea; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold;">1</span>
                                     <div>
                                         <strong>Webhook Trigger</strong>
-                                        <p style="font-size: 0.875rem; color: #666;">Receives script + screenshots</p>
+                                        <p style="font-size: 0.875rem; color: #666;">Receives script + optional screenshots</p>
                                     </div>
                                 </div>
                                 <div style="display: flex; align-items: center; gap: 1rem;">
@@ -478,28 +549,28 @@
                                     <span style="background: #667eea20; color: #667eea; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold;">3</span>
                                     <div>
                                         <strong>Claude Vision</strong>
-                                        <p style="font-size: 0.875rem; color: #666;">Analyzes visual style</p>
+                                        <p style="font-size: 0.875rem; color: #666;">Analyzes visual style (if screenshots provided)</p>
                                     </div>
                                 </div>
                                 <div style="display: flex; align-items: center; gap: 1rem;">
                                     <span style="background: #667eea20; color: #667eea; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold;">4</span>
                                     <div>
-                                        <strong>Pinterest Scraper</strong>
-                                        <p style="font-size: 0.875rem; color: #666;">Fetches style references</p>
+                                        <strong>Style Reference</strong>
+                                        <p style="font-size: 0.875rem; color: #666;">Processes Pinterest link if provided</p>
                                     </div>
                                 </div>
                                 <div style="display: flex; align-items: center; gap: 1rem;">
                                     <span style="background: #667eea20; color: #667eea; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold;">5</span>
                                     <div>
                                         <strong>Emotion Analyser</strong>
-                                        <p style="font-size: 0.875rem; color: #666;">Maps emotion arc</p>
+                                        <p style="font-size: 0.875rem; color: #666;">Maps emotion arc from script</p>
                                     </div>
                                 </div>
                                 <div style="display: flex; align-items: center; gap: 1rem;">
                                     <span style="background: #667eea20; color: #667eea; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold;">6</span>
                                     <div>
                                         <strong>YT Music Matcher</strong>
-                                        <p style="font-size: 0.875rem; color: #666;">Finds royalty-free music</p>
+                                        <p style="font-size: 0.875rem; color: #666;">Finds royalty-free music by emotion</p>
                                     </div>
                                 </div>
                             </div>
@@ -561,7 +632,7 @@
                     
                     <div class="grid">
                         <div class="form-group">
-                            <label class="form-label">Video Script</label>
+                            <label class="form-label">Video Script <span class="optional-badge">Required</span></label>
                             <textarea class="form-input form-textarea" id="scriptInput" placeholder="Paste your video script here...">INT. OFFICE - DAY
 
 A young designer sits at a computer, frustrated.
@@ -579,20 +650,26 @@ She starts typing excitedly as the camera zooms in.</textarea>
 
                         <div>
                             <div class="form-group">
-                                <label class="form-label">Screenshots (Base64)</label>
-                                <textarea class="form-input form-textarea" id="screenshotsInput" placeholder="Paste base64 encoded screenshots...">data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAA...</textarea>
+                                <label class="form-label">Screenshots <span class="optional-badge">Optional</span></label>
+                                <div class="file-upload" onclick="document.getElementById('fileInput').click()">
+                                    <input type="file" id="fileInput" multiple accept="image/*" onchange="handleFileUpload(event)">
+                                    <div class="file-upload-label">📁 Click to upload or drag and drop</div>
+                                    <p style="color: #999; margin-top: 0.5rem; font-size: 0.875rem;">PNG, JPG, GIF up to 10MB each</p>
+                                </div>
+                                <div id="filePreview" class="file-preview"></div>
                             </div>
 
                             <div class="form-group">
-                                <label class="form-label">Pinterest Board URL</label>
-                                <input type="url" class="form-input" id="pinterestInput" value="https://pinterest.com/your-board" placeholder="https://pinterest.com/...">
+                                <label class="form-label">Pinterest Reference <span class="optional-badge">Optional</span></label>
+                                <input type="url" class="form-input" id="pinterestInput" placeholder="https://pinterest.com/your-board" value="https://pinterest.com/design/storyboard-ideas">
+                                <p style="color: #999; margin-top: 0.5rem; font-size: 0.875rem;">Link to Pinterest board for style inspiration</p>
                             </div>
                         </div>
                     </div>
 
                     <div style="display: flex; gap: 1rem; justify-content: flex-end;">
                         <button class="btn btn-secondary" onclick="resetInputs()">Reset</button>
-                        <button class="btn" onclick="processInput()">Process Input →</button>
+                        <button class="btn" onclick="processInput()">Generate Storyboard →</button>
                     </div>
                 </div>
             </div>
@@ -647,9 +724,10 @@ She starts typing excitedly as the camera zooms in.</textarea>
                         {/* JSON will be populated by JavaScript */}
                     </div>
 
-                    <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                    <div style="display: flex; gap: 1rem; margin-top: 2rem; flex-wrap: wrap;">
                         <button class="btn" onclick="copyToClipboard()">Copy to Clipboard</button>
                         <button class="btn btn-secondary" onclick="downloadJson()">Download JSON</button>
+                        <button class="btn btn-secondary" onclick="refreshFigmaJson()">Refresh JSON</button>
                     </div>
                 </div>
             </div>
@@ -657,6 +735,9 @@ She starts typing excitedly as the camera zooms in.</textarea>
     </div>
 
     <script>
+        // Store uploaded files
+        let uploadedFiles = [];
+
         // Navigation
         function toggleMenu() {
             document.getElementById('navMenu').classList.toggle('active');
@@ -684,6 +765,38 @@ She starts typing excitedly as the camera zooms in.</textarea>
             }
         }
 
+        // File upload handling
+        function handleFileUpload(event) {
+            const files = Array.from(event.target.files);
+            files.forEach(file => {
+                if (file.size <= 10 * 1024 * 1024) { // 10MB limit
+                    uploadedFiles.push({
+                        name: file.name,
+                        size: (file.size / 1024).toFixed(2) + ' KB',
+                        type: file.type
+                    });
+                } else {
+                    alert(`${file.name} is too large. Maximum size is 10MB.`);
+                }
+            });
+            updateFilePreview();
+        }
+
+        function updateFilePreview() {
+            const preview = document.getElementById('filePreview');
+            preview.innerHTML = uploadedFiles.map((file, index) => `
+                <div class="file-preview-item">
+                    <span>📷 ${file.name} (${file.size})</span>
+                    <button onclick="removeFile(${index})">×</button>
+                </div>
+            `).join('');
+        }
+
+        function removeFile(index) {
+            uploadedFiles.splice(index, 1);
+            updateFilePreview();
+        }
+
         // Workflow simulation
         function runWorkflow() {
             const progressContainer = document.getElementById('workflowProgress');
@@ -700,11 +813,11 @@ She starts typing excitedly as the camera zooms in.</textarea>
                 const steps = [
                     'Receiving webhook...',
                     'Parsing script...',
-                    'Analyzing with Claude Vision...',
-                    'Scraping Pinterest...',
+                    uploadedFiles.length > 0 ? 'Analyzing screenshots with Claude Vision...' : 'Skipping visual analysis (no screenshots)...',
+                    document.getElementById('pinterestInput').value ? 'Processing Pinterest references...' : 'Skipping Pinterest (no link provided)...',
                     'Analyzing emotion arc...',
-                    'Matching music...',
-                    'Generating storyboard...',
+                    'Matching music to emotions...',
+                    'Generating storyboard frames...',
                     'Formatting for Figma...',
                     'Compiling assets...',
                     'Delivering webhook...',
@@ -717,6 +830,10 @@ She starts typing excitedly as the camera zooms in.</textarea>
                     clearInterval(interval);
                     setTimeout(() => {
                         alert('Workflow complete! Check the Storyboard, Music, and Figma Export pages.');
+                        // Refresh all data
+                        loadFrames();
+                        loadMusic();
+                        loadFigmaJson();
                         changePage('frames');
                     }, 500);
                 }
@@ -726,26 +843,25 @@ She starts typing excitedly as the camera zooms in.</textarea>
         // Process input
         function processInput() {
             const script = document.getElementById('scriptInput').value;
-            const screenshots = document.getElementById('screenshotsInput').value;
-            const pinterest = document.getElementById('pinterestInput').value;
             
-            if (!script || !screenshots || !pinterest) {
-                alert('Please fill in all fields');
+            if (!script) {
+                alert('Please enter a script');
                 return;
             }
             
             // Simulate processing
-            alert('Processing input... This will generate your storyboard.');
+            alert('Processing your script... This will generate your storyboard.');
             runWorkflow();
         }
 
         function resetInputs() {
             document.getElementById('scriptInput').value = '';
-            document.getElementById('screenshotsInput').value = '';
             document.getElementById('pinterestInput').value = '';
+            uploadedFiles = [];
+            updateFilePreview();
         }
 
-        // Load frames
+        // Load frames (now with guaranteed content)
         function loadFrames() {
             const frames = [
                 {
@@ -755,52 +871,58 @@ She starts typing excitedly as the camera zooms in.</textarea>
                     emotion: 'calm → curious',
                     motion: 'Slow zoom in · ease-out',
                     music: 'Lofi Chill',
-                    ref: 'Dark UI Hero'
+                    ref: 'Dark UI Hero',
+                    description: 'Character appears centred. Slow zoom-in. Background expands radially.'
                 },
                 {
                     id: 'FRAME_02',
                     title: 'Build Up — Energy Rising',
                     camera: 'MID SHOT',
                     emotion: 'excited',
-                    motion: 'Bars stagger grow',
+                    motion: 'Bars stagger grow · 0.1s delay',
                     music: 'Upbeat Corporate',
-                    ref: 'Motion Dashboard'
+                    ref: 'Motion Dashboard',
+                    description: 'Character reacts. Stats grow. Bars animate upward rhythmically.'
                 },
                 {
                     id: 'FRAME_03',
                     title: 'Climax — Moment of Truth',
                     camera: 'CLOSE-UP',
                     emotion: 'tense → triumph',
-                    motion: 'Quick push-in',
+                    motion: 'Quick push-in · ease-in-back',
                     music: 'Cinematic Tension',
-                    ref: 'Dark Drama Poster'
+                    ref: 'Dark Drama Poster',
+                    description: 'Fast push-in to face. Burst of radial light. Text slams in.'
                 },
                 {
                     id: 'FRAME_04',
                     title: 'Emotion Peak — Feel It',
                     camera: 'ECU FACE',
                     emotion: 'vulnerable',
-                    motion: 'Slow-mo 0.3x',
+                    motion: 'Slow-mo 0.3x · subtle drift',
                     music: 'Emotional Piano',
-                    ref: 'Emotional Editorial'
+                    ref: 'Emotional Editorial',
+                    description: 'Extreme close-up of face. Sound wave beneath. Slow motion moment.'
                 },
                 {
                     id: 'FRAME_05',
                     title: 'Resolution — Peace Found',
                     camera: 'MEDIUM WIDE',
                     emotion: 'resolved',
-                    motion: 'Pull back · linear',
+                    motion: 'Pull back · linear ease-out',
                     music: 'Peaceful Resolution',
-                    ref: 'Zen Minimal Design'
+                    ref: 'Zen Minimal Design',
+                    description: 'Camera pulls back. Rings expand outward. Character centred and settled.'
                 },
                 {
                     id: 'FRAME_06',
                     title: 'CTA — Action Moment',
                     camera: 'PRODUCT SHOT',
                     emotion: 'confident',
-                    motion: 'Bounce · spring',
+                    motion: 'Bounce · spring · 0.6s',
                     music: 'Uplifting End',
-                    ref: 'SaaS Landing CTA'
+                    ref: 'SaaS Landing CTA',
+                    description: 'Product button bounces in. Character gestures toward it. Brand colours pulse.'
                 }
             ];
             
@@ -808,6 +930,7 @@ She starts typing excitedly as the camera zooms in.</textarea>
             grid.innerHTML = frames.map(frame => `
                 <div class="frame-card">
                     <div class="frame-preview">
+                        🎬
                         <div style="position: absolute; bottom: 10px; right: 10px; background: rgba(255,255,255,0.9); padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: bold;">${frame.id}</div>
                     </div>
                     <div class="frame-content">
@@ -815,6 +938,7 @@ She starts typing excitedly as the camera zooms in.</textarea>
                         <div class="frame-meta">🎥 ${frame.camera}</div>
                         <div class="frame-meta">😌 ${frame.emotion}</div>
                         <div class="frame-meta">↗ ${frame.motion}</div>
+                        <div class="frame-meta" style="color: #555; font-size: 0.8rem; margin-top: 0.5rem;">${frame.description}</div>
                         <div class="frame-tags">
                             <span class="tag">🎵 ${frame.music}</span>
                             <span class="tag">📌 ${frame.ref}</span>
@@ -824,44 +948,62 @@ She starts typing excitedly as the camera zooms in.</textarea>
             `).join('');
         }
 
-        // Load music
+        // Load music (with guaranteed content)
         function loadMusic() {
             const musicByEmotion = {
                 calm: [
-                    { title: 'Lofi Chill', source: 'YouTube Audio Library' },
-                    { title: 'Soft Ambient Intro', source: 'Kevin MacLeod' }
+                    { title: 'Lofi Chill', source: 'YouTube Audio Library', duration: '2:34' },
+                    { title: 'Soft Ambient Intro', source: 'Kevin MacLeod', duration: '3:15' },
+                    { title: 'Peaceful Piano', source: 'Free Music Archive', duration: '2:58' },
+                    { title: 'Ambient Waves', source: 'Pixabay', duration: '4:02' },
+                    { title: 'Meditation Mood', source: 'Incompetech', duration: '3:45' }
                 ],
                 excited: [
-                    { title: 'Upbeat Corporate', source: 'AudioLibrary' },
-                    { title: 'Rising Energy Beat', source: 'NCS' }
+                    { title: 'Upbeat Corporate', source: 'AudioLibrary', duration: '2:15' },
+                    { title: 'Rising Energy Beat', source: 'NCS', duration: '3:30' },
+                    { title: 'Energetic Pop', source: 'Epidemic Sound', duration: '2:45' },
+                    { title: 'Motivation Drive', source: 'Mixkit', duration: '3:20' },
+                    { title: 'Power Up', source: 'Bensound', duration: '2:50' }
                 ],
                 tense: [
-                    { title: 'Cinematic Tension', source: 'Epidemic Sound Free' },
-                    { title: 'Epic Moment', source: 'Pixabay' }
+                    { title: 'Cinematic Tension', source: 'Epidemic Sound Free', duration: '3:45' },
+                    { title: 'Epic Moment', source: 'Pixabay', duration: '4:10' },
+                    { title: 'Suspense Builder', source: 'YouTube Audio Library', duration: '2:55' },
+                    { title: 'Dark Mystery', source: 'Kevin MacLeod', duration: '3:25' },
+                    { title: 'Thriller Approach', source: 'NCS', duration: '3:40' }
                 ],
                 vulnerable: [
-                    { title: 'Emotional Piano', source: 'Free Music Archive' },
-                    { title: 'Heartfelt Strings', source: 'Incompetech' }
+                    { title: 'Emotional Piano', source: 'Free Music Archive', duration: '3:50' },
+                    { title: 'Heartfelt Strings', source: 'Incompetech', duration: '4:15' },
+                    { title: 'Touching Moments', source: 'Bensound', duration: '3:05' },
+                    { title: 'Sad Reflection', source: 'Mixkit', duration: '2:40' },
+                    { title: 'Melancholic Guitar', source: 'Pixabay', duration: '3:35' }
                 ],
                 resolved: [
-                    { title: 'Peaceful Resolution', source: 'Mixkit' },
-                    { title: 'Calm Ambient End', source: 'Bensound' }
+                    { title: 'Peaceful Resolution', source: 'Mixkit', duration: '3:20' },
+                    { title: 'Calm Ambient End', source: 'Bensound', duration: '4:00' },
+                    { title: 'Hopeful Tomorrow', source: 'YouTube Audio Library', duration: '3:15' },
+                    { title: 'Serene Closing', source: 'Epidemic Sound', duration: '2:55' },
+                    { title: 'Gentle Outro', source: 'Free Music Archive', duration: '3:45' }
                 ],
                 confident: [
-                    { title: 'Uplifting End', source: 'Pixabay' },
-                    { title: 'Brand Sting', source: 'YouTube Audio Library' }
+                    { title: 'Uplifting End', source: 'Pixabay', duration: '2:30' },
+                    { title: 'Brand Sting', source: 'YouTube Audio Library', duration: '1:45' },
+                    { title: 'Triumphant Victory', source: 'NCS', duration: '3:55' },
+                    { title: 'Success Anthem', source: 'AudioLibrary', duration: '3:10' },
+                    { title: 'Confident Stride', source: 'Incompetech', duration: '2:50' }
                 ]
             };
             
             const musicList = document.getElementById('musicList');
             musicList.innerHTML = Object.entries(musicByEmotion).map(([emotion, tracks]) => `
                 <div style="margin-bottom: 2rem;">
-                    <h3 style="margin-bottom: 1rem; color: #667eea;">${emotion.toUpperCase()}</h3>
+                    <h3 style="margin-bottom: 1rem; color: #667eea; text-transform: capitalize;">${emotion}</h3>
                     ${tracks.map(track => `
                         <div class="music-item">
                             <div class="music-info">
                                 <div class="music-title">${track.title}</div>
-                                <div class="music-source">${track.source}</div>
+                                <div class="music-source">${track.source} · ${track.duration}</div>
                             </div>
                             <span class="music-tag">Free</span>
                         </div>
@@ -870,14 +1012,17 @@ She starts typing excitedly as the camera zooms in.</textarea>
             `).join('');
         }
 
-        // Load Figma JSON
+        // Load Figma JSON (with guaranteed content)
         function loadFigmaJson() {
+            const pinterestRef = document.getElementById('pinterestInput')?.value || 'https://pinterest.com/design/storyboard-ideas';
+            
             const figmaData = {
                 storyboard: {
                     project: "AI Video Storyboard",
                     style: "SaaS / Clean UI",
                     canvas_size: { w: 1920, h: 1080 },
-                    pinterest_ref: "https://pinterest.com/your-board",
+                    pinterest_ref: pinterestRef,
+                    screenshots_uploaded: uploadedFiles.length,
                     emotion_arc: ["calm", "excited", "tense", "vulnerable", "resolved", "confident"],
                     frames: [
                         {
@@ -886,13 +1031,18 @@ She starts typing excitedly as the camera zooms in.</textarea>
                             camera: "WIDE SHOT",
                             emotion: "calm → curious",
                             character_expression: "neutral, soft eyes, slight curiosity",
-                            typography: { font: "Instrument Serif", size: 48, weight: "Bold" },
+                            typography: { font: "Instrument Serif", size: 48, weight: "Bold", color: "#FFFFFF" },
                             motion: { type: "zoom-in", duration: 2, easing: "ease-out" },
                             color_palette: ["#302b63", "#24243e", "#f9c784", "#c4b5fd"],
                             pinterest_tag: "Dark UI Hero",
                             music: [
                                 { title: "Lofi Chill", source: "YouTube Audio Library", free: true },
                                 { title: "Soft Ambient Intro", source: "Kevin MacLeod", free: true }
+                            ],
+                            figma_layers: [
+                                { name: "BG/Gradient", type: "RECTANGLE" },
+                                { name: "Character/Face", type: "ELLIPSE" },
+                                { name: "Annotation/CameraAngle", type: "TEXT" }
                             ]
                         },
                         {
@@ -901,20 +1051,120 @@ She starts typing excitedly as the camera zooms in.</textarea>
                             camera: "MID SHOT",
                             emotion: "excited",
                             character_expression: "eyebrows raised, mouth open (surprise)",
-                            typography: { font: "Plus Jakarta Sans", size: 32, weight: "Semibold" },
+                            typography: { font: "Plus Jakarta Sans", size: 32, weight: "Semibold", color: "#333333" },
                             motion: { type: "stagger-grow", duration: 1.5, easing: "ease-out" },
                             color_palette: ["#2dd4bf", "#0d9488", "#f97316", "#fed7aa"],
                             pinterest_tag: "Motion Dashboard",
                             music: [
                                 { title: "Upbeat Corporate", source: "AudioLibrary", free: true },
                                 { title: "Rising Energy Beat", source: "NCS", free: true }
+                            ],
+                            figma_layers: [
+                                { name: "BG/White", type: "RECTANGLE" },
+                                { name: "Character/Full", type: "VECTOR" },
+                                { name: "Annotation/MotionArrow", type: "VECTOR" }
+                            ]
+                        },
+                        {
+                            id: "FRAME_03",
+                            scene: "Climax — Moment of Truth",
+                            camera: "CLOSE-UP",
+                            emotion: "tense → triumph",
+                            character_expression: "wide eyes, determined jaw, intense",
+                            typography: { font: "Plus Jakarta Sans", size: 56, weight: "Bold Italic", color: "#FFD700" },
+                            motion: { type: "push-in", duration: 0.4, easing: "ease-in-back" },
+                            color_palette: ["#2d3748", "#4a5568", "#fbbf24", "#dc2626"],
+                            pinterest_tag: "Dark Drama Poster",
+                            music: [
+                                { title: "Cinematic Tension", source: "Epidemic Sound Free", free: true },
+                                { title: "Epic Moment", source: "Pixabay", free: true }
+                            ],
+                            figma_layers: [
+                                { name: "BG/Dark", type: "RECTANGLE" },
+                                { name: "Character/FaceClose", type: "ELLIPSE" },
+                                { name: "Effect/Burst", type: "VECTOR" }
+                            ]
+                        },
+                        {
+                            id: "FRAME_04",
+                            scene: "Emotion Peak — Feel It",
+                            camera: "ECU FACE",
+                            emotion: "vulnerable",
+                            character_expression: "soft eyes, slight smile, emotional tear",
+                            typography: { font: "Instrument Serif", size: 40, weight: "Light Italic", color: "#FFFFFF" },
+                            motion: { type: "slow-mo", duration: 3, easing: "linear", speed: "0.3x" },
+                            color_palette: ["#4c1d95", "#6d28d9", "#fbcfe8", "#f472b6"],
+                            pinterest_tag: "Emotional Editorial",
+                            music: [
+                                { title: "Emotional Piano", source: "Free Music Archive", free: true },
+                                { title: "Heartfelt Strings", source: "Incompetech", free: true }
+                            ],
+                            figma_layers: [
+                                { name: "BG/PurpleGradient", type: "RECTANGLE" },
+                                { name: "Character/ECU", type: "ELLIPSE" },
+                                { name: "Effect/SoundWave", type: "VECTOR" }
+                            ]
+                        },
+                        {
+                            id: "FRAME_05",
+                            scene: "Resolution — Peace Found",
+                            camera: "MEDIUM WIDE",
+                            emotion: "resolved",
+                            character_expression: "relaxed, soft smile, eyes calm",
+                            typography: { font: "Inter", size: 28, weight: "Regular", color: "#2C3E50" },
+                            motion: { type: "pull-back", duration: 1.5, easing: "linear ease-out" },
+                            color_palette: ["#a7f3d0", "#6ee7b7", "#fde68a", "#fcd34d"],
+                            pinterest_tag: "Zen Minimal Design",
+                            music: [
+                                { title: "Peaceful Resolution", source: "Mixkit", free: true },
+                                { title: "Calm Ambient End", source: "Bensound", free: true }
+                            ],
+                            figma_layers: [
+                                { name: "BG/Mint", type: "RECTANGLE" },
+                                { name: "Character/Centered", type: "VECTOR" },
+                                { name: "Effect/Rings", type: "VECTOR" }
+                            ]
+                        },
+                        {
+                            id: "FRAME_06",
+                            scene: "CTA — Action Moment",
+                            camera: "PRODUCT SHOT",
+                            emotion: "confident",
+                            character_expression: "confident smile, pointing gesture",
+                            typography: { font: "Plus Jakarta Sans", size: 16, weight: "Bold", color: "#2563EB" },
+                            motion: { type: "bounce-in", duration: 0.6, easing: "spring" },
+                            color_palette: ["#eff6ff", "#93c5fd", "#2d5be3", "#1e3a8a"],
+                            pinterest_tag: "SaaS Landing CTA",
+                            music: [
+                                { title: "Uplifting End", source: "Pixabay", free: true },
+                                { title: "Brand Sting", source: "YouTube Audio Library", free: true }
+                            ],
+                            figma_layers: [
+                                { name: "BG/LightBlue", type: "RECTANGLE" },
+                                { name: "Character/Gesture", type: "VECTOR" },
+                                { name: "UI/Button", type: "RECTANGLE" }
                             ]
                         }
                     ]
+                },
+                webhook_delivery: {
+                    method: "POST",
+                    content_type: "application/json",
+                    payload_includes: ["storyboard", "music_list", "emotion_map", "figma_json"]
+                },
+                generated_at: new Date().toISOString(),
+                metadata: {
+                    screenshots_processed: uploadedFiles.length,
+                    pinterest_reference: pinterestRef
                 }
             };
             
             document.getElementById('figmaJson').textContent = JSON.stringify(figmaData, null, 2);
+        }
+
+        function refreshFigmaJson() {
+            loadFigmaJson();
+            alert('Figma JSON refreshed with latest data!');
         }
 
         // Copy to clipboard
