@@ -1,0 +1,38 @@
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg: #050508;
+  --surf: #0c0c14;
+  --card: #111120;
+  --card2: #16162a;
+  --border: #1e1e35;
+  --border2: #2a2a45;
+  --a1: #6c63ff;
+  --a2: #a855f7;
+  --a3: #22d3ee;
+  --a4: #f43f7a;
+  --a5: #f59e0b;
+  --a6: #10b981;
+  --text: #f0f0fa;
+  --text2: #a0a0c0;
+  --muted: #5a5a80;
+  --mono: 'DM Mono', monospace;
+  --sans: 'Plus Jakarta Sans', sans-serif;
+  --serif: 'Instrument Serif', serif;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--sans);
+  background: var(--bg);
+  color: var(--text);
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+
+::selection { background: rgba(108,99,255,0.3); color: #fff; }
