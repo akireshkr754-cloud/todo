@@ -1,1230 +1,950 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AI Storyboard Workflow — n8n × Figma</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<style>
-*{margin:0;padding:0;box-sizing:border-box;}
-:root{
-  --bg:#f7f7f5;
-  --white:#ffffff;
-  --ink:#0f0f14;
-  --ink2:#3a3a4a;
-  --muted:#8a8aa0;
-  --border:#e4e4ec;
-  --border2:#d0d0e0;
-  --a1:#2d5be3;   /* blue — primary */
-  --a2:#7c3aed;   /* violet — AI nodes */
-  --a3:#0ea5e9;   /* sky — analysis */
-  --a4:#e11d78;   /* pink — pinterest/emotion */
-  --a5:#d97706;   /* amber — music */
-  --a6:#059669;   /* green — output */
-  --a7:#dc2626;   /* red — webhook */
-  --mono:'DM Mono',monospace;
-  --sans:'Plus Jakarta Sans',sans-serif;
-  --serif:'Instrument Serif',serif;
-}
-html{scroll-behavior:smooth;}
-body{font-family:var(--sans);background:var(--bg);color:var(--ink);min-height:100vh;}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Storyboard Workflow System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-/* ─── PAGE ─── */
-.page{max-width:1160px;margin:0 auto;padding:56px 28px 100px;}
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
 
-/* ─── HEADER ─── */
-.header{
-  display:grid;grid-template-columns:1fr auto;align-items:start;
-  gap:24px;margin-bottom:72px;
-  animation:fadeUp .7s ease both;
-}
-.header-left{}
-.pill{
-  display:inline-flex;align-items:center;gap:7px;
-  font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;
-  color:var(--a1);background:color-mix(in srgb,var(--a1) 8%,transparent);
-  border:1px solid color-mix(in srgb,var(--a1) 20%,transparent);
-  padding:5px 12px;border-radius:100px;margin-bottom:20px;
-}
-.pill-dot{width:6px;height:6px;border-radius:50%;background:var(--a1);animation:pulse 2s infinite;}
-h1{font-family:var(--serif);font-size:clamp(36px,5vw,62px);line-height:1.08;font-weight:400;letter-spacing:-.5px;color:var(--ink);margin-bottom:14px;}
-h1 i{color:var(--a1);}
-.h1-sub{font-size:15px;color:var(--muted);line-height:1.65;max-width:520px;}
-.header-badge{
-  background:var(--ink);color:#fff;
-  border-radius:14px;padding:18px 22px;
-  font-family:var(--mono);font-size:11px;line-height:2;
-  white-space:nowrap;flex-shrink:0;
-}
-.header-badge .hb-row{display:flex;align-items:center;gap:8px;}
-.hb-dot{width:8px;height:8px;border-radius:50%;}
+        /* Navigation */
+        .navbar {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1rem 2rem;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+        }
 
-/* ─── SECTION HEADER ─── */
-.sec{margin-bottom:60px;animation:fadeUp .7s ease both;}
-.sec-hd{
-  display:flex;align-items:center;gap:14px;
-  margin-bottom:28px;
-}
-.sec-num{
-  font-family:var(--mono);font-size:10px;letter-spacing:.1em;
-  color:var(--muted);border:1px solid var(--border2);
-  padding:3px 10px;border-radius:100px;
-}
-.sec-name{font-size:13px;font-weight:700;color:var(--ink);letter-spacing:.02em;}
-.sec-line{flex:1;height:1px;background:var(--border);}
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
 
-/* ─── N8N WORKFLOW ─── */
-.workflow-box{
-  background:var(--white);border:1px solid var(--border);
-  border-radius:20px;padding:36px 32px;overflow-x:auto;
-}
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
 
-/* phase lanes */
-.phase-lane{
-  display:flex;flex-direction:column;gap:6px;margin-bottom:8px;
-}
-.phase-tag{
-  font-family:var(--mono);font-size:9px;letter-spacing:.12em;text-transform:uppercase;
-  color:var(--muted);margin-bottom:10px;
-}
-.flow-row{
-  display:flex;align-items:center;
-  gap:0;min-width:940px;
-}
+        .nav-menu {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
 
-/* node */
-.nd{
-  display:flex;flex-direction:column;align-items:center;gap:7px;
-  flex-shrink:0;cursor:pointer;
-  transition:transform .2s ease;
-}
-.nd:hover{transform:translateY(-4px);}
-.nd:hover .nd-b{border-color:var(--nc);box-shadow:0 8px 28px var(--ng);}
-.nd-b{
-  width:84px;height:84px;border-radius:16px;
-  border:1.5px solid var(--border);
-  background:var(--white);
-  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;
-  transition:all .25s;position:relative;overflow:hidden;
-}
-.nd-b::before{
-  content:'';position:absolute;top:0;left:0;right:0;height:3px;
-  background:var(--nc);border-radius:3px 3px 0 0;
-}
-.nd-b::after{
-  content:'';position:absolute;inset:0;
-  background:radial-gradient(ellipse at 50% 0%,var(--ng) 0%,transparent 65%);
-}
-.nd-ico{font-size:24px;position:relative;z-index:1;}
-.nd-tag{font-family:var(--mono);font-size:8px;color:var(--muted);position:relative;z-index:1;text-align:center;}
-.nd-name{font-size:10px;font-weight:700;color:var(--ink);text-align:center;max-width:88px;line-height:1.3;}
-.nd-step{
-  position:absolute;top:-7px;right:-7px;z-index:3;
-  width:18px;height:18px;border-radius:50%;
-  background:var(--nc);color:#fff;
-  font-family:var(--mono);font-size:8px;font-weight:500;
-  display:flex;align-items:center;justify-content:center;
-  border:2px solid var(--white);
-}
+        .nav-menu a {
+            text-decoration: none;
+            color: #333;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
 
-/* arrows */
-.ar{flex:1;min-width:20px;max-width:56px;display:flex;flex-direction:column;align-items:center;gap:3px;}
-.ar-line{
-  width:100%;height:1.5px;
-  background:linear-gradient(90deg,var(--border2) 0%,var(--border2) 80%,transparent 100%);
-  position:relative;
-}
-.ar-line::after{
-  content:'▶';position:absolute;right:-9px;top:50%;transform:translateY(-50%);
-  font-size:8px;color:var(--border2);
-}
-.ar-lbl{font-family:var(--mono);font-size:8px;color:var(--muted);white-space:nowrap;}
+        .nav-menu a:hover {
+            color: #667eea;
+        }
 
-/* branch arrow down */
-.branch{display:flex;flex-direction:column;align-items:center;margin:4px 0;}
-.branch-v{width:1.5px;height:28px;background:var(--border2);}
-.branch-h{font-size:8px;color:var(--border2);}
+        .menu-toggle {
+            display: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
 
-/* colors */
-.c-wh{--nc:var(--a7);--ng:rgba(220,38,38,.1);}
-.c-ex{--nc:var(--a2);--ng:rgba(124,58,237,.1);}
-.c-vi{--nc:var(--a3);--ng:rgba(14,165,233,.1);}
-.c-pi{--nc:var(--a4);--ng:rgba(225,29,120,.1);}
-.c-em{--nc:#f97316;--ng:rgba(249,115,22,.1);}
-.c-mu{--nc:var(--a5);--ng:rgba(217,119,6,.1);}
-.c-cl{--nc:var(--a2);--ng:rgba(124,58,237,.1);}
-.c-sb{--nc:var(--a6);--ng:rgba(5,150,105,.1);}
-.c-co{--nc:var(--a1);--ng:rgba(45,91,227,.1);}
-.c-ou{--nc:var(--a6);--ng:rgba(5,150,105,.1);}
+        /* Main Content */
+        .main-content {
+            padding-top: 80px;
+            min-height: 100vh;
+        }
 
-/* ─── NODE CARDS GRID ─── */
-.nodes-grid{
-  display:grid;grid-template-columns:repeat(3,1fr);gap:14px;
-}
-@media(max-width:700px){.nodes-grid{grid-template-columns:1fr 1fr;}}
-@media(max-width:480px){.nodes-grid{grid-template-columns:1fr;}}
+        .page {
+            display: none;
+            animation: fadeIn 0.5s ease-in-out;
+        }
 
-.nc-card{
-  background:var(--white);border:1px solid var(--border);
-  border-radius:14px;padding:18px;
-  transition:border-color .2s,transform .2s;
-  cursor:default;
-}
-.nc-card:hover{border-color:var(--ncc);transform:translateY(-2px);}
-.nc-top{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
-.nc-icon{
-  width:38px;height:38px;border-radius:10px;flex-shrink:0;
-  background:color-mix(in srgb,var(--ncc) 10%,transparent);
-  border:1px solid color-mix(in srgb,var(--ncc) 20%,transparent);
-  display:flex;align-items:center;justify-content:center;font-size:18px;
-}
-.nc-info{}
-.nc-name{font-size:12px;font-weight:700;margin-bottom:1px;}
-.nc-type{font-family:var(--mono);font-size:9px;color:var(--ncc);letter-spacing:.05em;}
-.nc-desc{font-size:11.5px;color:var(--ink2);line-height:1.55;margin-bottom:10px;}
-.nc-config{
-  background:var(--bg);border-radius:8px;padding:9px 11px;
-  font-family:var(--mono);font-size:9.5px;color:var(--ink2);line-height:1.8;
-}
-.nc-config .k{color:var(--muted);}
-.nc-config .v{color:var(--a1);}
-.nc-config .v2{color:var(--a2);}
-.nc-config .v3{color:var(--a6);}
+        .page.active {
+            display: block;
+        }
 
-/* ─── FIGMA STORYBOARD ─── */
-.figma-section{animation:fadeUp .7s .1s ease both;}
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
 
-/* frame container */
-.sb-frames{
-  display:grid;grid-template-columns:repeat(2,1fr);gap:20px;
-}
-@media(max-width:700px){.sb-frames{grid-template-columns:1fr;}}
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
 
-.sb-frame{
-  background:var(--white);border:1px solid var(--border);
-  border-radius:18px;overflow:hidden;
-  transition:transform .25s,box-shadow .25s;
-}
-.sb-frame:hover{transform:translateY(-4px);box-shadow:0 20px 48px rgba(0,0,0,.09);}
+        /* Cards */
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
 
-/* frame top bar — Figma style */
-.sb-topbar{
-  background:#1e1e2e;
-  display:flex;align-items:center;justify-content:space-between;
-  padding:9px 14px;
-}
-.sb-frame-id{font-family:var(--mono);font-size:9px;color:#8888bb;letter-spacing:.1em;}
-.sb-frame-tags{display:flex;gap:6px;}
-.sb-ftag{
-  font-family:var(--mono);font-size:8px;padding:2px 7px;border-radius:3px;
-  font-weight:500;
-}
+        .card-header {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 1.5rem;
+            color: #333;
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 1rem;
+        }
 
-/* canvas area */
-.sb-canvas{
-  aspect-ratio:16/9;position:relative;overflow:hidden;
-  background:var(--canvas-bg, #1a1a2e);
-  display:flex;align-items:center;justify-content:center;
-}
+        /* Grid */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
 
-/* scene illustration — CSS only */
-.scene-art{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;}
+        /* Buttons */
+        .btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 10px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
 
-/* --- Scene 1: Intro/Hook --- */
-.s1-bg{position:absolute;inset:0;background:linear-gradient(135deg,#0f0c29,#302b63,#24243e);}
-.s1-circle{
-  width:120px;height:120px;border-radius:50%;
-  background:radial-gradient(circle,rgba(255,255,255,.12),transparent);
-  border:1px solid rgba(255,255,255,.08);
-  position:absolute;
-}
-.s1-face{
-  width:56px;height:56px;border-radius:50%;
-  background:linear-gradient(135deg,#f9c784,#f0a05a);
-  position:relative;z-index:2;
-  box-shadow:0 4px 20px rgba(249,199,132,.3);
-}
-.s1-face::before{/* eyes */
-  content:'';position:absolute;top:38%;left:50%;transform:translateX(-50%);
-  width:22px;height:4px;
-  background:transparent;
-  box-shadow:-7px 0 0 2px #3a2a1a,7px 0 0 2px #3a2a1a;
-}
-.s1-text{
-  position:absolute;bottom:18px;left:18px;right:18px;
-  font-family:var(--mono);font-size:10px;color:rgba(255,255,255,.5);
-  letter-spacing:.06em;
-}
-.s1-headline{
-  position:absolute;top:18px;left:18px;
-  font-family:var(--sans);font-size:13px;font-weight:700;color:#fff;
-  letter-spacing:-.01em;
-}
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
 
-/* --- Scene 2: Build Up --- */
-.s2-bg{position:absolute;inset:0;background:linear-gradient(135deg,#fff8f0,#ffecd2);}
-.s2-bar{
-  position:absolute;bottom:0;width:100%;display:flex;align-items:flex-end;
-  gap:6px;padding:0 24px 0;
-}
-.s2-b{background:linear-gradient(180deg,#f97316,#dc2626);border-radius:4px 4px 0 0;width:16px;}
-.s2-face2{
-  width:52px;height:52px;border-radius:50%;
-  background:linear-gradient(135deg,#fbbf24,#f59e0b);
-  position:absolute;top:50%;left:50%;transform:translate(-50%,-65%);
-  z-index:2;
-}
-.s2-face2::before{
-  content:'';position:absolute;top:42%;left:50%;transform:translateX(-50%);
-  width:20px;height:3px;
-  box-shadow:-6px 0 0 2px #78350f,6px 0 0 2px #78350f;
-}
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+        }
 
-/* --- Scene 3: Climax --- */
-.s3-bg{position:absolute;inset:0;background:linear-gradient(135deg,#1a0533,#4c1d95);}
-.s3-burst{
-  position:absolute;width:180px;height:180px;top:50%;left:50%;transform:translate(-50%,-50%);
-  background:radial-gradient(circle,rgba(167,139,250,.25) 0%,transparent 65%);
-  border-radius:50%;
-}
-.s3-face3{
-  width:58px;height:58px;border-radius:50%;
-  background:linear-gradient(135deg,#c4b5fd,#a78bfa);
-  position:absolute;top:50%;left:50%;transform:translate(-50%,-60%);
-  z-index:2;box-shadow:0 0 28px rgba(167,139,250,.5);
-}
-.s3-face3::before{
-  content:'';position:absolute;top:40%;left:50%;transform:translateX(-50%);
-  width:22px;height:4px;
-  box-shadow:-7px 0 0 2.5px #4c1d95,7px 0 0 2.5px #4c1d95;
-}
+        .btn-secondary:hover {
+            background: #e0e0e0;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
 
-/* --- Scene 4: Emotion peak --- */
-.s4-bg{position:absolute;inset:0;background:linear-gradient(135deg,#fdf2f8,#fce7f3);}
-.s4-wave{
-  position:absolute;bottom:10px;left:0;right:0;height:48px;
-  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 48'%3E%3Cpath d='M0 24 Q50 0 100 24 Q150 48 200 24 Q250 0 300 24 Q350 48 400 24' stroke='%23ec4899' stroke-width='2' fill='none'/%3E%3C/svg%3E") center/cover;
-  opacity:.5;
-}
-.s4-face4{
-  width:54px;height:54px;border-radius:50%;
-  background:linear-gradient(135deg,#f9a8d4,#ec4899);
-  position:absolute;top:50%;left:50%;transform:translate(-50%,-60%);
-  z-index:2;box-shadow:0 4px 20px rgba(236,72,153,.3);
-}
-.s4-face4::before{
-  content:'';position:absolute;top:42%;left:50%;transform:translateX(-50%);
-  width:20px;height:3px;
-  box-shadow:-6px 0 0 2px #831843,6px 0 0 2px #831843;
-}
+        /* Forms */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
 
-/* --- Scene 5: Resolution --- */
-.s5-bg{position:absolute;inset:0;background:linear-gradient(135deg,#ecfdf5,#d1fae5);}
-.s5-rings{
-  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
-  width:140px;height:140px;border-radius:50%;
-  border:1px solid rgba(5,150,105,.15);
-  box-shadow:0 0 0 30px rgba(5,150,105,.06),0 0 0 60px rgba(5,150,105,.03);
-}
-.s5-face5{
-  position:absolute;top:50%;left:50%;transform:translate(-50%,-60%);
-  width:52px;height:52px;border-radius:50%;
-  background:linear-gradient(135deg,#6ee7b7,#34d399);
-  z-index:2;box-shadow:0 4px 16px rgba(52,211,153,.3);
-}
-.s5-face5::before{
-  content:'';position:absolute;top:42%;left:50%;transform:translateX(-50%);
-  width:20px;height:3px;
-  box-shadow:-6px 0 0 2px #065f46,6px 0 0 2px #065f46;
-}
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #555;
+        }
 
-/* --- Scene 6: CTA --- */
-.s6-bg{position:absolute;inset:0;background:linear-gradient(135deg,#eff6ff,#dbeafe);}
-.s6-btn{
-  position:absolute;top:50%;left:50%;transform:translate(-50%,-10%);
-  background:#2d5be3;color:#fff;
-  font-family:var(--sans);font-size:11px;font-weight:700;
-  padding:9px 20px;border-radius:8px;letter-spacing:.01em;
-  box-shadow:0 4px 18px rgba(45,91,227,.35);
-}
-.s6-face6{
-  position:absolute;top:50%;left:50%;transform:translate(-50%,-200%);
-  width:50px;height:50px;border-radius:50%;
-  background:linear-gradient(135deg,#93c5fd,#60a5fa);
-  z-index:2;
-}
-.s6-face6::before{
-  content:'';position:absolute;top:40%;left:50%;transform:translateX(-50%);
-  width:18px;height:3px;
-  box-shadow:-5px 0 0 2px #1e3a8a,5px 0 0 2px #1e3a8a;
-}
+        .form-input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
 
-/* annotation layer */
-.sb-annot{
-  position:absolute;inset:0;pointer-events:none;
-}
+        .form-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
 
-/* motion arrow */
-.m-arrow{
-  position:absolute;
-  display:flex;align-items:center;gap:3px;
-}
-.m-arw-line{height:1.5px;background:rgba(255,255,255,.55);position:relative;}
-.m-arw-line::after{content:'▶';position:absolute;right:-7px;top:50%;transform:translateY(-50%);font-size:7px;color:rgba(255,255,255,.55);}
-.m-arw-label{font-family:var(--mono);font-size:7.5px;color:rgba(255,255,255,.55);white-space:nowrap;}
-.m-arrow-dark .m-arw-line{background:rgba(0,0,0,.35);}
-.m-arrow-dark .m-arw-line::after{color:rgba(0,0,0,.35);}
-.m-arrow-dark .m-arw-label{color:rgba(0,0,0,.4);}
+        .form-textarea {
+            min-height: 150px;
+            resize: vertical;
+        }
 
-/* camera badge */
-.cam-badge{
-  position:absolute;top:10px;right:10px;
-  background:rgba(0,0,0,.55);backdrop-filter:blur(4px);
-  font-family:var(--mono);font-size:8px;color:rgba(255,255,255,.8);
-  padding:3px 8px;border-radius:4px;letter-spacing:.06em;
-}
-.cam-badge-light{background:rgba(255,255,255,.75);color:rgba(0,0,0,.6);}
+        /* Progress Bar */
+        .progress-container {
+            margin: 2rem 0;
+        }
 
-/* typography note */
-.typo-note{
-  position:absolute;
-  font-family:var(--mono);font-size:8px;
-  border:1px dashed rgba(255,255,255,.3);
-  padding:3px 7px;border-radius:3px;
-  color:rgba(255,255,255,.6);
-  background:rgba(0,0,0,.25);
-}
-.typo-note-light{
-  border-color:rgba(0,0,0,.2);color:rgba(0,0,0,.45);background:rgba(255,255,255,.6);
-}
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background: #f0f0f0;
+            border-radius: 5px;
+            overflow: hidden;
+        }
 
-/* ── INFO PANEL below canvas ── */
-.sb-info{padding:16px 18px;border-top:1px solid var(--border);}
-.sb-info-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:10px;}
-.sb-scene-title{font-size:13px;font-weight:700;color:var(--ink);}
-.sb-scene-desc{font-size:11px;color:var(--muted);margin-top:2px;line-height:1.5;}
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            transition: width 0.3s;
+        }
 
-/* pinterest tag */
-.pint-tag{
-  display:flex;align-items:center;gap:5px;
-  font-family:var(--mono);font-size:9px;
-  background:#fef2f2;color:#e11d48;
-  border:1px solid #fecdd3;padding:3px 9px;border-radius:4px;
-  flex-shrink:0;
-}
+        /* Steps */
+        .steps {
+            display: flex;
+            justify-content: space-between;
+            margin: 2rem 0;
+            position: relative;
+        }
 
-/* mood + palette row */
-.sb-row2{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:8px;}
-.mood-chip{
-  font-family:var(--mono);font-size:9px;
-  padding:3px 9px;border-radius:100px;
-  font-weight:500;
-}
-.palette{display:flex;gap:4px;align-items:center;}
-.swatch{width:16px;height:16px;border-radius:4px;border:1px solid rgba(0,0,0,.08);}
-.palette-label{font-family:var(--mono);font-size:8px;color:var(--muted);}
+        .steps::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #e0e0e0;
+            transform: translateY(-50%);
+            z-index: 1;
+        }
 
-/* motion notes */
-.motion-notes{
-  background:var(--bg);border-radius:8px;padding:9px 11px;
-  display:flex;flex-direction:column;gap:4px;
-}
-.mn-row{display:flex;align-items:baseline;gap:7px;}
-.mn-key{font-family:var(--mono);font-size:9px;color:var(--muted);flex-shrink:0;min-width:64px;}
-.mn-val{font-size:11px;color:var(--ink2);}
+        .step {
+            background: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #666;
+            position: relative;
+            z-index: 2;
+            border: 2px solid #e0e0e0;
+        }
 
-/* music row */
-.music-row{
-  margin-top:8px;display:flex;gap-6px;flex-wrap:wrap;gap:6px;
-}
-.music-chip{
-  display:flex;align-items:center;gap:5px;
-  background:#fffbeb;border:1px solid #fde68a;
-  font-size:10px;padding:4px 9px;border-radius:6px;color:#92400e;
-}
+        .step.active {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border-color: transparent;
+        }
 
-/* ─── JSON EXPORT SECTION ─── */
-.json-section{animation:fadeUp .7s .2s ease both;}
-.json-box{
-  background:#1e1e2e;border-radius:16px;overflow:hidden;
-  border:1px solid #2a2a40;
-}
-.json-topbar{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:12px 18px;border-bottom:1px solid #2a2a40;
-}
-.json-title{font-family:var(--mono);font-size:11px;color:#8888bb;letter-spacing:.06em;}
-.json-actions{display:flex;gap:8px;}
-.json-btn{
-  font-family:var(--mono);font-size:9px;letter-spacing:.06em;
-  padding:4px 11px;border-radius:5px;cursor:pointer;border:none;
-  transition:opacity .15s;
-}
-.json-btn:hover{opacity:.8;}
-.json-btn.copy{background:#2d5be3;color:#fff;}
-.json-btn.dl{background:#2a2a40;color:#8888bb;}
-pre{
-  padding:24px 28px;overflow-x:auto;
-  font-family:var(--mono);font-size:11px;line-height:1.8;
-  color:#cdd6f4;max-height:420px;overflow-y:auto;
-}
-pre::-webkit-scrollbar{width:4px;height:4px;}
-pre::-webkit-scrollbar-track{background:#1e1e2e;}
-pre::-webkit-scrollbar-thumb{background:#2a2a40;border-radius:2px;}
-.j-key{color:#89b4fa;}
-.j-str{color:#a6e3a1;}
-.j-num{color:#fab387;}
-.j-kw{color:#cba6f7;}
-.j-comment{color:#585b70;font-style:italic;}
+        /* Frames */
+        .frames-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
 
-/* ─── WORKFLOW STEPS ─── */
-.steps-grid{
-  display:grid;grid-template-columns:repeat(2,1fr);gap:14px;
-}
-@media(max-width:640px){.steps-grid{grid-template-columns:1fr;}}
-.step-card{
-  background:var(--white);border:1px solid var(--border);
-  border-radius:14px;padding:18px 20px;
-  display:flex;gap:14px;align-items:flex-start;
-  transition:border-color .2s,transform .2s;
-}
-.step-card:hover{border-color:var(--sc);transform:translateY(-2px);}
-.step-num{
-  width:30px;height:30px;border-radius:8px;flex-shrink:0;
-  background:color-mix(in srgb,var(--sc) 10%,transparent);
-  border:1px solid color-mix(in srgb,var(--sc) 20%,transparent);
-  display:flex;align-items:center;justify-content:center;
-  font-family:var(--mono);font-size:11px;font-weight:500;color:var(--sc);
-}
-.step-body{}
-.step-title{font-size:13px;font-weight:700;margin-bottom:5px;}
-.step-desc{font-size:11.5px;color:var(--muted);line-height:1.55;}
+        .frame-card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+            transition: transform 0.3s;
+        }
 
-/* ─── ANIMATIONS ─── */
-@keyframes fadeUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
-@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.4;}}
-@keyframes blink{0%,100%{opacity:1;}50%{opacity:.3;}}
+        .frame-card:hover {
+            transform: translateY(-5px);
+        }
 
-/* scroll animation */
-[data-anim]{opacity:0;transform:translateY(20px);transition:opacity .6s ease,transform .6s ease;}
-[data-anim].visible{opacity:1;transform:translateY(0);}
+        .frame-preview {
+            height: 150px;
+            background: linear-gradient(135deg, #667eea20, #764ba220);
+            position: relative;
+            overflow: hidden;
+        }
 
-/* ─── TOAST ─── */
-#toast{
-  position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(60px);
-  background:var(--ink);color:#fff;font-family:var(--mono);font-size:11px;
-  padding:10px 20px;border-radius:8px;transition:transform .3s ease;z-index:999;
-  pointer-events:none;
-}
-#toast.show{transform:translateX(-50%) translateY(0);}
-</style>
+        .frame-content {
+            padding: 1.5rem;
+        }
+
+        .frame-title {
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            color: #333;
+        }
+
+        .frame-meta {
+            font-size: 0.875rem;
+            color: #666;
+            margin-bottom: 0.5rem;
+        }
+
+        .frame-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .tag {
+            background: #f0f0f0;
+            padding: 0.25rem 0.75rem;
+            border-radius: 15px;
+            font-size: 0.75rem;
+            color: #555;
+        }
+
+        /* Music List */
+        .music-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .music-item:last-child {
+            border-bottom: none;
+        }
+
+        .music-info {
+            flex: 1;
+        }
+
+        .music-title {
+            font-weight: 500;
+            color: #333;
+        }
+
+        .music-source {
+            font-size: 0.875rem;
+            color: #666;
+        }
+
+        .music-tag {
+            background: #e8f0fe;
+            color: #667eea;
+            padding: 0.25rem 0.75rem;
+            border-radius: 15px;
+            font-size: 0.75rem;
+        }
+
+        /* JSON Output */
+        .json-output {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 1.5rem;
+            border-radius: 10px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.875rem;
+            overflow-x: auto;
+            white-space: pre-wrap;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .menu-toggle {
+                display: block;
+            }
+
+            .nav-menu {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: white;
+                flex-direction: column;
+                padding: 1rem;
+                gap: 1rem;
+                box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            }
+
+            .nav-menu.active {
+                display: flex;
+            }
+
+            .steps {
+                flex-wrap: wrap;
+                gap: 0.5rem;
+            }
+
+            .steps::before {
+                display: none;
+            }
+
+            .step {
+                width: 100%;
+                text-align: center;
+            }
+
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 </head>
 <body>
-<div id="toast">✓ Copied to clipboard</div>
-<div class="page">
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">AI Storyboard</div>
+            <div class="menu-toggle" onclick="toggleMenu()">☰</div>
+            <ul class="nav-menu" id="navMenu">
+                <li><a href="#" onclick="changePage('home')">Home</a></li>
+                <li><a href="#" onclick="changePage('workflow')">Workflow</a></li>
+                <li><a href="#" onclick="changePage('input')">Input</a></li>
+                <li><a href="#" onclick="changePage('frames')">Storyboard</a></li>
+                <li><a href="#" onclick="changePage('music')">Music</a></li>
+                <li><a href="#" onclick="changePage('figma')">Figma Export</a></li>
+            </ul>
+        </div>
+    </nav>
 
-  <!-- HEADER -->
-  <header class="header">
-    <div class="header-left">
-      <div class="pill"><span class="pill-dot"></span> n8n × Figma × Claude AI</div>
-      <h1>AI <i>Storyboard</i><br>Workflow System</h1>
-      <p class="h1-sub">Paste your script + screenshots → Claude analyses story, emotion & style → generates a full Figma-ready storyboard with music, motion notes & Pinterest references.</p>
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Home Page -->
+        <div id="home" class="page active">
+            <div class="container">
+                <div class="card">
+                    <h1 class="card-header">AI Storyboard Workflow System</h1>
+                    <p style="font-size: 1.125rem; color: #666; margin-bottom: 2rem;">Transform your script and screenshots into a complete Figma-ready storyboard with AI-powered analysis, music matching, and motion notes.</p>
+                    
+                    <div class="grid">
+                        <div class="card" style="margin: 0;">
+                            <h3 style="margin-bottom: 1rem;">🎬 Input</h3>
+                            <p style="color: #666; margin-bottom: 1.5rem;">Paste your script, upload screenshots, and add a Pinterest board URL for style references.</p>
+                            <button class="btn" onclick="changePage('input')">Start New Project →</button>
+                        </div>
+                        
+                        <div class="card" style="margin: 0;">
+                            <h3 style="margin-bottom: 1rem;">🤖 AI Processing</h3>
+                            <p style="color: #666; margin-bottom: 1.5rem;">Claude AI analyzes emotion, style, and generates complete storyboard with music.</p>
+                            <button class="btn btn-secondary" onclick="changePage('workflow')">View Workflow →</button>
+                        </div>
+                        
+                        <div class="card" style="margin: 0;">
+                            <h3 style="margin-bottom: 1rem;">🎨 Figma Export</h3>
+                            <p style="color: #666; margin-bottom: 1.5rem;">Get JSON ready to import into Figma with all frames, layers, and annotations.</p>
+                            <button class="btn btn-secondary" onclick="changePage('figma')">See Example →</button>
+                        </div>
+                    </div>
+
+                    <div style="text-align: center; margin-top: 3rem;">
+                        <div style="display: inline-block; background: white; padding: 2rem; border-radius: 20px; box-shadow: 0 5px 20px rgba(0,0,0,0.05);">
+                            <h3 style="margin-bottom: 1rem;">⚡ Quick Start</h3>
+                            <div class="steps">
+                                <span class="step active">1. Input Script</span>
+                                <span class="step">2. AI Analysis</span>
+                                <span class="step">3. Generate</span>
+                                <span class="step">4. Export</span>
+                            </div>
+                            <button class="btn" onclick="changePage('input')" style="margin-top: 1.5rem;">Start Now</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Workflow Page -->
+        <div id="workflow" class="page">
+            <div class="container">
+                <div class="card">
+                    <h1 class="card-header">n8n Workflow Diagram</h1>
+                    
+                    <div class="steps" style="margin: 2rem 0;">
+                        <span class="step active">INPUT PHASE</span>
+                        <span class="step">AI GENERATION</span>
+                        <span class="step">OUTPUT PHASE</span>
+                    </div>
+
+                    <div class="grid">
+                        <div class="card" style="margin: 0;">
+                            <h3 style="color: #667eea; margin-bottom: 1rem;">01. INPUT PHASE</h3>
+                            <div style="display: flex; flex-direction: column; gap: 1rem;">
+                                <div style="display: flex; align-items: center; gap: 1rem;">
+                                    <span style="background: #667eea20; color: #667eea; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold;">1</span>
+                                    <div>
+                                        <strong>Webhook Trigger</strong>
+                                        <p style="font-size: 0.875rem; color: #666;">Receives script + screenshots</p>
+                                    </div>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 1rem;">
+                                    <span style="background: #667eea20; color: #667eea; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold;">2</span>
+                                    <div>
+                                        <strong>Script Parser</strong>
+                                        <p style="font-size: 0.875rem; color: #666;">Splits script into scenes</p>
+                                    </div>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 1rem;">
+                                    <span style="background: #667eea20; color: #667eea; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold;">3</span>
+                                    <div>
+                                        <strong>Claude Vision</strong>
+                                        <p style="font-size: 0.875rem; color: #666;">Analyzes visual style</p>
+                                    </div>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 1rem;">
+                                    <span style="background: #667eea20; color: #667eea; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold;">4</span>
+                                    <div>
+                                        <strong>Pinterest Scraper</strong>
+                                        <p style="font-size: 0.875rem; color: #666;">Fetches style references</p>
+                                    </div>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 1rem;">
+                                    <span style="background: #667eea20; color: #667eea; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold;">5</span>
+                                    <div>
+                                        <strong>Emotion Analyser</strong>
+                                        <p style="font-size: 0.875rem; color: #666;">Maps emotion arc</p>
+                                    </div>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 1rem;">
+                                    <span style="background: #667eea20; color: #667eea; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold;">6</span>
+                                    <div>
+                                        <strong>YT Music Matcher</strong>
+                                        <p style="font-size: 0.875rem; color: #666;">Finds royalty-free music</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card" style="margin: 0;">
+                            <h3 style="color: #764ba2; margin-bottom: 1rem;">02. AI GENERATION</h3>
+                            <div style="display: flex; flex-direction: column; gap: 1rem;">
+                                <div style="display: flex; align-items: center; gap: 1rem;">
+                                    <span style="background: #764ba220; color: #764ba2; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold;">7</span>
+                                    <div>
+                                        <strong>Storyboard Generator</strong>
+                                        <p style="font-size: 0.875rem; color: #666;">Creates complete storyboard JSON</p>
+                                    </div>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 1rem;">
+                                    <span style="background: #764ba220; color: #764ba2; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold;">8</span>
+                                    <div>
+                                        <strong>Figma Formatter</strong>
+                                        <p style="font-size: 0.875rem; color: #666;">Transforms to Figma schema</p>
+                                    </div>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 1rem;">
+                                    <span style="background: #764ba220; color: #764ba2; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold;">9</span>
+                                    <div>
+                                        <strong>Asset Compiler</strong>
+                                        <p style="font-size: 0.875rem; color: #666;">Merges all assets</p>
+                                    </div>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 1rem;">
+                                    <span style="background: #764ba220; color: #764ba2; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold;">10</span>
+                                    <div>
+                                        <strong>Webhook Delivery</strong>
+                                        <p style="font-size: 0.875rem; color: #666;">Sends final JSON bundle</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="text-align: center; margin-top: 2rem;">
+                        <button class="btn" onclick="runWorkflow()">Run Complete Workflow</button>
+                        <div class="progress-container" id="workflowProgress" style="display: none;">
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="progressFill" style="width: 0%;"></div>
+                            </div>
+                            <p id="progressText" style="margin-top: 0.5rem; color: #666;">Processing...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Input Page -->
+        <div id="input" class="page">
+            <div class="container">
+                <div class="card">
+                    <h1 class="card-header">Project Input</h1>
+                    
+                    <div class="grid">
+                        <div class="form-group">
+                            <label class="form-label">Video Script</label>
+                            <textarea class="form-input form-textarea" id="scriptInput" placeholder="Paste your video script here...">INT. OFFICE - DAY
+
+A young designer sits at a computer, frustrated.
+
+DESIGNER
+This isn't working. I need something better.
+
+Suddenly, an idea strikes. Her eyes light up.
+
+DESIGNER
+AI Storyboard! That's it!
+
+She starts typing excitedly as the camera zooms in.</textarea>
+                        </div>
+
+                        <div>
+                            <div class="form-group">
+                                <label class="form-label">Screenshots (Base64)</label>
+                                <textarea class="form-input form-textarea" id="screenshotsInput" placeholder="Paste base64 encoded screenshots...">data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAA...</textarea>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Pinterest Board URL</label>
+                                <input type="url" class="form-input" id="pinterestInput" value="https://pinterest.com/your-board" placeholder="https://pinterest.com/...">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 1rem; justify-content: flex-end;">
+                        <button class="btn btn-secondary" onclick="resetInputs()">Reset</button>
+                        <button class="btn" onclick="processInput()">Process Input →</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Frames Page (Storyboard) -->
+        <div id="frames" class="page">
+            <div class="container">
+                <div class="card">
+                    <h1 class="card-header">Generated Storyboard Frames</h1>
+                    
+                    <div class="frames-grid" id="framesGrid">
+                        <!-- Frames will be populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Music Page -->
+        <div id="music" class="page">
+            <div class="container">
+                <div class="card">
+                    <h1 class="card-header">Emotion-Matched Music</h1>
+                    
+                    <div class="steps" style="margin: 2rem 0;">
+                        <span class="step">Calm</span>
+                        <span class="step">Excited</span>
+                        <span class="step">Tense</span>
+                        <span class="step">Vulnerable</span>
+                        <span class="step">Resolved</span>
+                        <span class="step">Confident</span>
+                    </div>
+
+                    <div id="musicList">
+                        <!-- Music list will be populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Figma Export Page -->
+        <div id="figma" class="page">
+            <div class="container">
+                <div class="card">
+                    <h1 class="card-header">Figma Import JSON</h1>
+                    
+                    <div style="background: #f8f9fa; padding: 1rem; border-radius: 10px; margin-bottom: 2rem;">
+                        <p style="color: #666;">Copy this JSON and paste into Figma using "JSON to Figma" plugin</p>
+                    </div>
+
+                    <div class="json-output" id="figmaJson">
+                        {/* JSON will be populated by JavaScript */}
+                    </div>
+
+                    <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                        <button class="btn" onclick="copyToClipboard()">Copy to Clipboard</button>
+                        <button class="btn btn-secondary" onclick="downloadJson()">Download JSON</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-    <div class="header-badge">
-      <div class="hb-row"><span class="hb-dot" style="background:var(--a7)"></span> Trigger: Webhook Input</div>
-      <div class="hb-row"><span class="hb-dot" style="background:var(--a2)"></span> AI: Claude Vision + Analysis</div>
-      <div class="hb-row"><span class="hb-dot" style="background:var(--a4)"></span> Style: Pinterest Scraper</div>
-      <div class="hb-row"><span class="hb-dot" style="background:#f97316"></span> Emotion → YT Music Match</div>
-      <div class="hb-row"><span class="hb-dot" style="background:var(--a6)"></span> Output: JSON → Figma</div>
-    </div>
-  </header>
 
-  <!-- SECTION 1: WORKFLOW -->
-  <section class="sec" data-anim>
-    <div class="sec-hd">
-      <span class="sec-num">01</span>
-      <span class="sec-name">n8n WORKFLOW DIAGRAM</span>
-      <span class="sec-line"></span>
-    </div>
+    <script>
+        // Navigation
+        function toggleMenu() {
+            document.getElementById('navMenu').classList.toggle('active');
+        }
 
-    <div class="workflow-box">
-      <!-- ROW 1: INPUT PHASE -->
-      <div class="phase-tag">── INPUT PHASE</div>
-      <div class="flow-row" style="margin-bottom:32px;">
-        <div class="nd c-wh">
-          <div class="nd-b"><span class="nd-step">1</span><span class="nd-ico">🪝</span><span class="nd-tag">TRIGGER</span></div>
-          <span class="nd-name">Webhook<br>Input</span>
-        </div>
-        <div class="ar"><div class="ar-line"></div><span class="ar-lbl">script+images</span></div>
-        <div class="nd c-ex">
-          <div class="nd-b"><span class="nd-step">2</span><span class="nd-ico">📄</span><span class="nd-tag">EXTRACT</span></div>
-          <span class="nd-name">Script<br>Parser</span>
-        </div>
-        <div class="ar"><div class="ar-line"></div><span class="ar-lbl">frames</span></div>
-        <div class="nd c-vi">
-          <div class="nd-b"><span class="nd-step">3</span><span class="nd-ico">👁️</span><span class="nd-tag">VISION</span></div>
-          <span class="nd-name">Claude<br>Vision</span>
-        </div>
-        <div class="ar"><div class="ar-line"></div><span class="ar-lbl">visual context</span></div>
-        <div class="nd c-pi">
-          <div class="nd-b"><span class="nd-step">4</span><span class="nd-ico">📌</span><span class="nd-tag">HTTP</span></div>
-          <span class="nd-name">Pinterest<br>Scraper</span>
-        </div>
-        <div class="ar"><div class="ar-line"></div><span class="ar-lbl">style refs</span></div>
-        <div class="nd c-em">
-          <div class="nd-b"><span class="nd-step">5</span><span class="nd-ico">🎭</span><span class="nd-tag">CLAUDE AI</span></div>
-          <span class="nd-name">Emotion<br>Analyser</span>
-        </div>
-        <div class="ar"><div class="ar-line"></div><span class="ar-lbl">emotion map</span></div>
-        <div class="nd c-mu">
-          <div class="nd-b"><span class="nd-step">6</span><span class="nd-ico">🎵</span><span class="nd-tag">YT SEARCH</span></div>
-          <span class="nd-name">Music<br>Matcher</span>
-        </div>
-      </div>
+        function changePage(pageId) {
+            // Hide all pages
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+            
+            // Show selected page
+            document.getElementById(pageId).classList.add('active');
+            
+            // Close mobile menu
+            document.getElementById('navMenu').classList.remove('active');
+            
+            // Load page-specific data
+            if (pageId === 'frames') {
+                loadFrames();
+            } else if (pageId === 'music') {
+                loadMusic();
+            } else if (pageId === 'figma') {
+                loadFigmaJson();
+            }
+        }
 
-      <!-- ROW 2: AI + OUTPUT PHASE -->
-      <div class="phase-tag">── AI GENERATION + OUTPUT PHASE</div>
-      <div class="flow-row">
-        <div class="nd c-cl">
-          <div class="nd-b"><span class="nd-step">7</span><span class="nd-ico">🧠</span><span class="nd-tag">CLAUDE AI</span></div>
-          <span class="nd-name">Storyboard<br>Generator</span>
-        </div>
-        <div class="ar"><div class="ar-line"></div><span class="ar-lbl">scenes JSON</span></div>
-        <div class="nd c-sb">
-          <div class="nd-b"><span class="nd-step">8</span><span class="nd-ico">🎨</span><span class="nd-tag">TRANSFORM</span></div>
-          <span class="nd-name">Figma<br>Formatter</span>
-        </div>
-        <div class="ar"><div class="ar-line"></div><span class="ar-lbl">figma JSON</span></div>
-        <div class="nd c-co">
-          <div class="nd-b"><span class="nd-step">9</span><span class="nd-ico">🗜️</span><span class="nd-tag">MERGE</span></div>
-          <span class="nd-name">Asset<br>Compiler</span>
-        </div>
-        <div class="ar"><div class="ar-line"></div><span class="ar-lbl">full bundle</span></div>
-        <div class="nd c-ou">
-          <div class="nd-b"><span class="nd-step">10</span><span class="nd-ico">📤</span><span class="nd-tag">WEBHOOK OUT</span></div>
-          <span class="nd-name">Webhook<br>Delivery</span>
-        </div>
-      </div>
-    </div>
-  </section>
+        // Workflow simulation
+        function runWorkflow() {
+            const progressContainer = document.getElementById('workflowProgress');
+            const progressFill = document.getElementById('progressFill');
+            const progressText = document.getElementById('progressText');
+            
+            progressContainer.style.display = 'block';
+            
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += 10;
+                progressFill.style.width = progress + '%';
+                
+                const steps = [
+                    'Receiving webhook...',
+                    'Parsing script...',
+                    'Analyzing with Claude Vision...',
+                    'Scraping Pinterest...',
+                    'Analyzing emotion arc...',
+                    'Matching music...',
+                    'Generating storyboard...',
+                    'Formatting for Figma...',
+                    'Compiling assets...',
+                    'Delivering webhook...',
+                    'Complete!'
+                ];
+                
+                progressText.textContent = steps[Math.floor(progress / 10)];
+                
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    setTimeout(() => {
+                        alert('Workflow complete! Check the Storyboard, Music, and Figma Export pages.');
+                        changePage('frames');
+                    }, 500);
+                }
+            }, 300);
+        }
 
-  <!-- SECTION 2: NODE DETAILS -->
-  <section class="sec" data-anim>
-    <div class="sec-hd">
-      <span class="sec-num">02</span>
-      <span class="sec-name">NODE CONFIGURATION</span>
-      <span class="sec-line"></span>
-    </div>
-    <div class="nodes-grid">
+        // Process input
+        function processInput() {
+            const script = document.getElementById('scriptInput').value;
+            const screenshots = document.getElementById('screenshotsInput').value;
+            const pinterest = document.getElementById('pinterestInput').value;
+            
+            if (!script || !screenshots || !pinterest) {
+                alert('Please fill in all fields');
+                return;
+            }
+            
+            // Simulate processing
+            alert('Processing input... This will generate your storyboard.');
+            runWorkflow();
+        }
 
-      <div class="nc-card" style="--ncc:var(--a7)">
-        <div class="nc-top">
-          <div class="nc-icon">🪝</div>
-          <div class="nc-info">
-            <div class="nc-name">Webhook Input</div>
-            <div class="nc-type">n8n · Webhook Trigger</div>
-          </div>
-        </div>
-        <div class="nc-desc">Receives POST with video script (text), screenshots (base64), and Pinterest board URL.</div>
-        <div class="nc-config">
-          <span class="k">method: </span><span class="v">POST</span><br>
-          <span class="k">path: </span><span class="v">"/storyboard"</span><br>
-          <span class="k">auth: </span><span class="v2">Header Token</span><br>
-          <span class="k">body: </span><span class="v">multipart/form-data</span>
-        </div>
-      </div>
+        function resetInputs() {
+            document.getElementById('scriptInput').value = '';
+            document.getElementById('screenshotsInput').value = '';
+            document.getElementById('pinterestInput').value = '';
+        }
 
-      <div class="nc-card" style="--ncc:var(--a2)">
-        <div class="nc-top">
-          <div class="nc-icon">📄</div>
-          <div class="nc-info">
-            <div class="nc-name">Script Parser</div>
-            <div class="nc-type">n8n · Code Node (JS)</div>
-          </div>
-        </div>
-        <div class="nc-desc">Splits script into scenes by timestamp or paragraph. Extracts dialogue, action lines, and shot descriptions.</div>
-        <div class="nc-config">
-          <span class="k">split_by: </span><span class="v2">paragraph / [SCENE]</span><br>
-          <span class="k">output: </span><span class="v">[{scene, text, type}]</span><br>
-          <span class="k">max_scenes: </span><span class="v3">20</span>
-        </div>
-      </div>
+        // Load frames
+        function loadFrames() {
+            const frames = [
+                {
+                    id: 'FRAME_01',
+                    title: 'Hook — Introduce the World',
+                    camera: 'WIDE SHOT',
+                    emotion: 'calm → curious',
+                    motion: 'Slow zoom in · ease-out',
+                    music: 'Lofi Chill',
+                    ref: 'Dark UI Hero'
+                },
+                {
+                    id: 'FRAME_02',
+                    title: 'Build Up — Energy Rising',
+                    camera: 'MID SHOT',
+                    emotion: 'excited',
+                    motion: 'Bars stagger grow',
+                    music: 'Upbeat Corporate',
+                    ref: 'Motion Dashboard'
+                },
+                {
+                    id: 'FRAME_03',
+                    title: 'Climax — Moment of Truth',
+                    camera: 'CLOSE-UP',
+                    emotion: 'tense → triumph',
+                    motion: 'Quick push-in',
+                    music: 'Cinematic Tension',
+                    ref: 'Dark Drama Poster'
+                },
+                {
+                    id: 'FRAME_04',
+                    title: 'Emotion Peak — Feel It',
+                    camera: 'ECU FACE',
+                    emotion: 'vulnerable',
+                    motion: 'Slow-mo 0.3x',
+                    music: 'Emotional Piano',
+                    ref: 'Emotional Editorial'
+                },
+                {
+                    id: 'FRAME_05',
+                    title: 'Resolution — Peace Found',
+                    camera: 'MEDIUM WIDE',
+                    emotion: 'resolved',
+                    motion: 'Pull back · linear',
+                    music: 'Peaceful Resolution',
+                    ref: 'Zen Minimal Design'
+                },
+                {
+                    id: 'FRAME_06',
+                    title: 'CTA — Action Moment',
+                    camera: 'PRODUCT SHOT',
+                    emotion: 'confident',
+                    motion: 'Bounce · spring',
+                    music: 'Uplifting End',
+                    ref: 'SaaS Landing CTA'
+                }
+            ];
+            
+            const grid = document.getElementById('framesGrid');
+            grid.innerHTML = frames.map(frame => `
+                <div class="frame-card">
+                    <div class="frame-preview">
+                        <div style="position: absolute; bottom: 10px; right: 10px; background: rgba(255,255,255,0.9); padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: bold;">${frame.id}</div>
+                    </div>
+                    <div class="frame-content">
+                        <div class="frame-title">${frame.title}</div>
+                        <div class="frame-meta">🎥 ${frame.camera}</div>
+                        <div class="frame-meta">😌 ${frame.emotion}</div>
+                        <div class="frame-meta">↗ ${frame.motion}</div>
+                        <div class="frame-tags">
+                            <span class="tag">🎵 ${frame.music}</span>
+                            <span class="tag">📌 ${frame.ref}</span>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
 
-      <div class="nc-card" style="--ncc:var(--a3)">
-        <div class="nc-top">
-          <div class="nc-icon">👁️</div>
-          <div class="nc-info">
-            <div class="nc-name">Claude Vision</div>
-            <div class="nc-type">HTTP · Anthropic API</div>
-          </div>
-        </div>
-        <div class="nc-desc">Analyses uploaded screenshots — identifies visual style, character expressions, environment, and lighting mood.</div>
-        <div class="nc-config">
-          <span class="k">model: </span><span class="v2">claude-opus-4-6</span><br>
-          <span class="k">input: </span><span class="v">base64 images</span><br>
-          <span class="k">extract: </span><span class="v">style, mood, faces</span>
-        </div>
-      </div>
+        // Load music
+        function loadMusic() {
+            const musicByEmotion = {
+                calm: [
+                    { title: 'Lofi Chill', source: 'YouTube Audio Library' },
+                    { title: 'Soft Ambient Intro', source: 'Kevin MacLeod' }
+                ],
+                excited: [
+                    { title: 'Upbeat Corporate', source: 'AudioLibrary' },
+                    { title: 'Rising Energy Beat', source: 'NCS' }
+                ],
+                tense: [
+                    { title: 'Cinematic Tension', source: 'Epidemic Sound Free' },
+                    { title: 'Epic Moment', source: 'Pixabay' }
+                ],
+                vulnerable: [
+                    { title: 'Emotional Piano', source: 'Free Music Archive' },
+                    { title: 'Heartfelt Strings', source: 'Incompetech' }
+                ],
+                resolved: [
+                    { title: 'Peaceful Resolution', source: 'Mixkit' },
+                    { title: 'Calm Ambient End', source: 'Bensound' }
+                ],
+                confident: [
+                    { title: 'Uplifting End', source: 'Pixabay' },
+                    { title: 'Brand Sting', source: 'YouTube Audio Library' }
+                ]
+            };
+            
+            const musicList = document.getElementById('musicList');
+            musicList.innerHTML = Object.entries(musicByEmotion).map(([emotion, tracks]) => `
+                <div style="margin-bottom: 2rem;">
+                    <h3 style="margin-bottom: 1rem; color: #667eea;">${emotion.toUpperCase()}</h3>
+                    ${tracks.map(track => `
+                        <div class="music-item">
+                            <div class="music-info">
+                                <div class="music-title">${track.title}</div>
+                                <div class="music-source">${track.source}</div>
+                            </div>
+                            <span class="music-tag">Free</span>
+                        </div>
+                    `).join('')}
+                </div>
+            `).join('');
+        }
 
-      <div class="nc-card" style="--ncc:var(--a4)">
-        <div class="nc-top">
-          <div class="nc-icon">📌</div>
-          <div class="nc-info">
-            <div class="nc-name">Pinterest Scraper</div>
-            <div class="nc-type">HTTP · Pinterest API v5</div>
-          </div>
-        </div>
-        <div class="nc-desc">Fetches pins from your Pinterest board. Extracts dominant colors, typography styles, and animation aesthetic references.</div>
-        <div class="nc-config">
-          <span class="k">endpoint: </span><span class="v">/boards/{id}/pins</span><br>
-          <span class="k">extract: </span><span class="v">colors, fonts, mood</span><br>
-          <span class="k">limit: </span><span class="v3">24 pins</span>
-        </div>
-      </div>
+        // Load Figma JSON
+        function loadFigmaJson() {
+            const figmaData = {
+                storyboard: {
+                    project: "AI Video Storyboard",
+                    style: "SaaS / Clean UI",
+                    canvas_size: { w: 1920, h: 1080 },
+                    pinterest_ref: "https://pinterest.com/your-board",
+                    emotion_arc: ["calm", "excited", "tense", "vulnerable", "resolved", "confident"],
+                    frames: [
+                        {
+                            id: "FRAME_01",
+                            scene: "Hook — Introduce the World",
+                            camera: "WIDE SHOT",
+                            emotion: "calm → curious",
+                            character_expression: "neutral, soft eyes, slight curiosity",
+                            typography: { font: "Instrument Serif", size: 48, weight: "Bold" },
+                            motion: { type: "zoom-in", duration: 2, easing: "ease-out" },
+                            color_palette: ["#302b63", "#24243e", "#f9c784", "#c4b5fd"],
+                            pinterest_tag: "Dark UI Hero",
+                            music: [
+                                { title: "Lofi Chill", source: "YouTube Audio Library", free: true },
+                                { title: "Soft Ambient Intro", source: "Kevin MacLeod", free: true }
+                            ]
+                        },
+                        {
+                            id: "FRAME_02",
+                            scene: "Build Up — Energy Rising",
+                            camera: "MID SHOT",
+                            emotion: "excited",
+                            character_expression: "eyebrows raised, mouth open (surprise)",
+                            typography: { font: "Plus Jakarta Sans", size: 32, weight: "Semibold" },
+                            motion: { type: "stagger-grow", duration: 1.5, easing: "ease-out" },
+                            color_palette: ["#2dd4bf", "#0d9488", "#f97316", "#fed7aa"],
+                            pinterest_tag: "Motion Dashboard",
+                            music: [
+                                { title: "Upbeat Corporate", source: "AudioLibrary", free: true },
+                                { title: "Rising Energy Beat", source: "NCS", free: true }
+                            ]
+                        }
+                    ]
+                }
+            };
+            
+            document.getElementById('figmaJson').textContent = JSON.stringify(figmaData, null, 2);
+        }
 
-      <div class="nc-card" style="--ncc:#f97316">
-        <div class="nc-top">
-          <div class="nc-icon">🎭</div>
-          <div class="nc-info">
-            <div class="nc-name">Emotion Analyser</div>
-            <div class="nc-type">HTTP · Claude AI</div>
-          </div>
-        </div>
-        <div class="nc-desc">Reads the full script + visual context. Maps each scene to an emotion arc: joy, tension, melancholy, triumph, suspense, calm.</div>
-        <div class="nc-config">
-          <span class="k">output: </span><span class="v">[{scene, emotion, intensity}]</span><br>
-          <span class="k">arc_type: </span><span class="v2">hero / narrative</span><br>
-          <span class="k">format: </span><span class="v">JSON</span>
-        </div>
-      </div>
+        // Copy to clipboard
+        function copyToClipboard() {
+            const jsonText = document.getElementById('figmaJson').textContent;
+            navigator.clipboard.writeText(jsonText).then(() => {
+                alert('JSON copied to clipboard!');
+            }).catch(() => {
+                alert('Failed to copy. Please select and copy manually.');
+            });
+        }
 
-      <div class="nc-card" style="--ncc:var(--a5)">
-        <div class="nc-top">
-          <div class="nc-icon">🎵</div>
-          <div class="nc-info">
-            <div class="nc-name">YT Music Matcher</div>
-            <div class="nc-type">HTTP · YouTube Data API v3</div>
-          </div>
-        </div>
-        <div class="nc-desc">Uses emotion tags to search YouTube for free-to-use background music. Returns 5 options per scene with BPM and mood metadata.</div>
-        <div class="nc-config">
-          <span class="k">query: </span><span class="v2">{emotion} + "no copyright"</span><br>
-          <span class="k">filter: </span><span class="v">creativeCommons</span><br>
-          <span class="k">per_scene: </span><span class="v3">5 tracks</span>
-        </div>
-      </div>
+        // Download JSON
+        function downloadJson() {
+            const jsonText = document.getElementById('figmaJson').textContent;
+            const blob = new Blob([jsonText], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'storyboard_figma_export.json';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
 
-      <div class="nc-card" style="--ncc:var(--a2)">
-        <div class="nc-top">
-          <div class="nc-icon">🧠</div>
-          <div class="nc-info">
-            <div class="nc-name">Storyboard Generator</div>
-            <div class="nc-type">HTTP · Claude AI (Main)</div>
-          </div>
-        </div>
-        <div class="nc-desc">The core node. Takes all inputs — script scenes, vision output, emotion map, Pinterest style — and generates complete storyboard JSON with Figma annotations.</div>
-        <div class="nc-config">
-          <span class="k">model: </span><span class="v2">claude-sonnet-4-6</span><br>
-          <span class="k">prompt: </span><span class="v">storyboard_system.txt</span><br>
-          <span class="k">output: </span><span class="v">structured JSON</span>
-        </div>
-      </div>
-
-      <div class="nc-card" style="--ncc:var(--a1)">
-        <div class="nc-top">
-          <div class="nc-icon">🎨</div>
-          <div class="nc-info">
-            <div class="nc-name">Figma Formatter</div>
-            <div class="nc-type">n8n · Code Node (JS)</div>
-          </div>
-        </div>
-        <div class="nc-desc">Transforms Claude's output into Figma Plugin JSON schema — with frames, text layers, component IDs, motion arrow vectors, and color styles.</div>
-        <div class="nc-config">
-          <span class="k">schema: </span><span class="v">figma-plugin-v2</span><br>
-          <span class="k">frame_size: </span><span class="v3">1920×1080</span><br>
-          <span class="k">components: </span><span class="v">auto-named</span>
-        </div>
-      </div>
-
-      <div class="nc-card" style="--ncc:var(--a6)">
-        <div class="nc-top">
-          <div class="nc-icon">📤</div>
-          <div class="nc-info">
-            <div class="nc-name">Webhook Delivery</div>
-            <div class="nc-type">n8n · HTTP Request (POST)</div>
-          </div>
-        </div>
-        <div class="nc-desc">Sends the final compiled JSON bundle to your custom webhook URL. Includes storyboard, music list, emotion map and Figma import file.</div>
-        <div class="nc-config">
-          <span class="k">method: </span><span class="v">POST</span><br>
-          <span class="k">body: </span><span class="v">full_bundle.json</span><br>
-          <span class="k">header: </span><span class="v2">X-Workflow-ID</span>
-        </div>
-      </div>
-
-    </div>
-  </section>
-
-  <!-- SECTION 3: FIGMA STORYBOARD -->
-  <section class="sec figma-section" data-anim>
-    <div class="sec-hd">
-      <span class="sec-num">03</span>
-      <span class="sec-name">FIGMA STORYBOARD FRAMES — SaaS CLEAN STYLE</span>
-      <span class="sec-line"></span>
-    </div>
-
-    <div class="sb-frames">
-
-      <!-- FRAME 1 -->
-      <div class="sb-frame">
-        <div class="sb-topbar">
-          <span class="sb-frame-id">FRAME_01 / Scene_Hook</span>
-          <div class="sb-frame-tags">
-            <span class="sb-ftag" style="background:rgba(45,91,227,.2);color:#93b4ff">SaaS</span>
-            <span class="sb-ftag" style="background:rgba(124,58,237,.2);color:#c4b5fd">Intro</span>
-          </div>
-        </div>
-        <div class="sb-canvas">
-          <div class="scene-art">
-            <div class="s1-bg"></div>
-            <div class="s1-circle" style="width:160px;height:160px;top:50%;left:50%;transform:translate(-50%,-50%)"></div>
-            <div class="s1-circle" style="width:90px;height:90px;top:50%;left:50%;transform:translate(-50%,-50%)"></div>
-            <div class="s1-face"></div>
-          </div>
-          <div class="sb-annot">
-            <span class="cam-badge">🎥 WIDE SHOT</span>
-            <div class="m-arrow" style="top:60%;left:16%;">
-              <span class="m-arw-label">ZOOM IN →</span>
-              <div class="m-arw-line" style="width:52px;margin-left:6px;"></div>
-            </div>
-            <span class="typo-note" style="bottom:14px;left:14px;">Tt · Display Bold · 48pt</span>
-          </div>
-        </div>
-        <div class="sb-info">
-          <div class="sb-info-top">
-            <div>
-              <div class="sb-scene-title">Hook — Introduce the World</div>
-              <div class="sb-scene-desc">Character appears centred. Slow zoom-in. Background expands radially.</div>
-            </div>
-            <div class="pint-tag">📌 Ref: Dark UI Hero</div>
-          </div>
-          <div class="sb-row2">
-            <span class="mood-chip" style="background:#f0f0ff;color:#4c1d95;">😌 Calm → Curious</span>
-            <div class="palette">
-              <span class="palette-label">Mood:</span>
-              <span class="swatch" style="background:#302b63"></span>
-              <span class="swatch" style="background:#24243e"></span>
-              <span class="swatch" style="background:#f9c784"></span>
-              <span class="swatch" style="background:#c4b5fd"></span>
-            </div>
-          </div>
-          <div class="motion-notes">
-            <div class="mn-row"><span class="mn-key">↗ Motion</span><span class="mn-val">Slow zoom in · 0s–2s · ease-out</span></div>
-            <div class="mn-row"><span class="mn-key">✦ Effect</span><span class="mn-val">Radial ring expand, opacity 0→1</span></div>
-            <div class="mn-row"><span class="mn-key">📝 Type</span><span class="mn-val">Title fade up · Instrument Serif 48pt</span></div>
-          </div>
-          <div class="music-row">
-            <span class="music-chip">🎵 Lofi Chill – No Copyright Background Music</span>
-            <span class="music-chip">🎵 Soft Ambient Intro – Kevin MacLeod</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- FRAME 2 -->
-      <div class="sb-frame">
-        <div class="sb-topbar">
-          <span class="sb-frame-id">FRAME_02 / Scene_BuildUp</span>
-          <div class="sb-frame-tags">
-            <span class="sb-ftag" style="background:rgba(249,115,22,.2);color:#fdba74">Energy</span>
-            <span class="sb-ftag" style="background:rgba(234,179,8,.2);color:#fde047">Rising</span>
-          </div>
-        </div>
-        <div class="sb-canvas">
-          <div class="scene-art">
-            <div class="s2-bg"></div>
-            <div class="s2-face2"></div>
-            <div class="s2-bar">
-              <div class="s2-b" style="height:28px"></div>
-              <div class="s2-b" style="height:40px"></div>
-              <div class="s2-b" style="height:52px"></div>
-              <div class="s2-b" style="height:36px"></div>
-              <div class="s2-b" style="height:60px"></div>
-              <div class="s2-b" style="height:44px"></div>
-              <div class="s2-b" style="height:70px"></div>
-              <div class="s2-b" style="height:48px"></div>
-            </div>
-          </div>
-          <div class="sb-annot">
-            <span class="cam-badge cam-badge-light">🎥 MID SHOT</span>
-            <div class="m-arrow m-arrow-dark" style="top:28%;right:18%;">
-              <span class="m-arw-label">PAN LEFT</span>
-              <div class="m-arw-line" style="width:40px;margin-left:6px;"></div>
-            </div>
-            <span class="typo-note typo-note-light" style="top:14px;left:14px;">Tt · Semibold · 32pt · Warm</span>
-          </div>
-        </div>
-        <div class="sb-info">
-          <div class="sb-info-top">
-            <div>
-              <div class="sb-scene-title">Build Up — Energy Rising</div>
-              <div class="sb-scene-desc">Character reacts. Stats grow. Bars animate upward rhythmically.</div>
-            </div>
-            <div class="pint-tag">📌 Ref: Motion Dashboard</div>
-          </div>
-          <div class="sb-row2">
-            <span class="mood-chip" style="background:#fff7ed;color:#c2410c;">⚡ Excited</span>
-            <div class="palette">
-              <span class="palette-label">Mood:</span>
-              <span class="swatch" style="background:#fff8f0"></span>
-              <span class="swatch" style="background:#f97316"></span>
-              <span class="swatch" style="background:#fbbf24"></span>
-              <span class="swatch" style="background:#dc2626"></span>
-            </div>
-          </div>
-          <div class="motion-notes">
-            <div class="mn-row"><span class="mn-key">↗ Motion</span><span class="mn-val">Bars stagger grow · 0.1s delay each</span></div>
-            <div class="mn-row"><span class="mn-key">✦ Effect</span><span class="mn-val">Pan left camera · bounce ease</span></div>
-            <div class="mn-row"><span class="mn-key">😮 Face</span><span class="mn-val">Eyebrows raised · mouth open (surprise)</span></div>
-          </div>
-          <div class="music-row">
-            <span class="music-chip">🎵 Upbeat Corporate – AudioLibrary</span>
-            <span class="music-chip">🎵 Rising Energy Beat – NCS</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- FRAME 3 -->
-      <div class="sb-frame">
-        <div class="sb-topbar">
-          <span class="sb-frame-id">FRAME_03 / Scene_Climax</span>
-          <div class="sb-frame-tags">
-            <span class="sb-ftag" style="background:rgba(124,58,237,.2);color:#c4b5fd">Peak</span>
-            <span class="sb-ftag" style="background:rgba(168,85,247,.2);color:#e9d5ff">Drama</span>
-          </div>
-        </div>
-        <div class="sb-canvas">
-          <div class="scene-art">
-            <div class="s3-bg"></div>
-            <div class="s3-burst"></div>
-            <div class="s3-face3"></div>
-          </div>
-          <div class="sb-annot">
-            <span class="cam-badge">🎥 CLOSE-UP</span>
-            <div class="m-arrow" style="bottom:22%;left:12%;">
-              <div class="m-arw-line" style="width:36px;margin-right:6px;"></div>
-              <span class="m-arw-label">← PUSH IN</span>
-            </div>
-            <span class="typo-note" style="top:14px;left:14px;">Tt · Bold Italic · 56pt · Glow</span>
-          </div>
-        </div>
-        <div class="sb-info">
-          <div class="sb-info-top">
-            <div>
-              <div class="sb-scene-title">Climax — Moment of Truth</div>
-              <div class="sb-scene-desc">Fast push-in to face. Burst of radial light. Text slams in.</div>
-            </div>
-            <div class="pint-tag">📌 Ref: Dark Drama Poster</div>
-          </div>
-          <div class="sb-row2">
-            <span class="mood-chip" style="background:#f5f3ff;color:#6d28d9;">💥 Tense → Triumph</span>
-            <div class="palette">
-              <span class="palette-label">Mood:</span>
-              <span class="swatch" style="background:#1a0533"></span>
-              <span class="swatch" style="background:#4c1d95"></span>
-              <span class="swatch" style="background:#a78bfa"></span>
-              <span class="swatch" style="background:#ffffff"></span>
-            </div>
-          </div>
-          <div class="motion-notes">
-            <div class="mn-row"><span class="mn-key">↗ Motion</span><span class="mn-val">Quick push-in · 0.4s · ease-in-back</span></div>
-            <div class="mn-row"><span class="mn-key">✦ Effect</span><span class="mn-val">Burst scale 0→1.4→1 · glow pulse</span></div>
-            <div class="mn-row"><span class="mn-key">😮 Face</span><span class="mn-val">Wide eyes · determined jaw · intense</span></div>
-          </div>
-          <div class="music-row">
-            <span class="music-chip">🎵 Cinematic Tension – Epidemic Sound Free</span>
-            <span class="music-chip">🎵 Epic Moment – Pixabay</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- FRAME 4 -->
-      <div class="sb-frame">
-        <div class="sb-topbar">
-          <span class="sb-frame-id">FRAME_04 / Scene_Emotion</span>
-          <div class="sb-frame-tags">
-            <span class="sb-ftag" style="background:rgba(236,72,153,.2);color:#f9a8d4">Heart</span>
-            <span class="sb-ftag" style="background:rgba(244,63,94,.2);color:#fda4af">Peak</span>
-          </div>
-        </div>
-        <div class="sb-canvas">
-          <div class="scene-art">
-            <div class="s4-bg"></div>
-            <div class="s4-face4"></div>
-            <div class="s4-wave"></div>
-          </div>
-          <div class="sb-annot">
-            <span class="cam-badge cam-badge-light">🎥 ECU FACE</span>
-            <div class="m-arrow m-arrow-dark" style="top:16%;right:16%;">
-              <span class="m-arw-label">SLOW-MO ↓</span>
-            </div>
-            <span class="typo-note typo-note-light" style="bottom:14px;right:14px;">Tt · Light · 40pt · Italic</span>
-          </div>
-        </div>
-        <div class="sb-info">
-          <div class="sb-info-top">
-            <div>
-              <div class="sb-scene-title">Emotion Peak — Feel It</div>
-              <div class="sb-scene-desc">Extreme close-up of face. Sound wave beneath. Slow motion moment.</div>
-            </div>
-            <div class="pint-tag">📌 Ref: Emotional Editorial</div>
-          </div>
-          <div class="sb-row2">
-            <span class="mood-chip" style="background:#fdf2f8;color:#be185d;">💗 Vulnerable</span>
-            <div class="palette">
-              <span class="palette-label">Mood:</span>
-              <span class="swatch" style="background:#fdf2f8"></span>
-              <span class="swatch" style="background:#f9a8d4"></span>
-              <span class="swatch" style="background:#ec4899"></span>
-              <span class="swatch" style="background:#831843"></span>
-            </div>
-          </div>
-          <div class="motion-notes">
-            <div class="mn-row"><span class="mn-key">↗ Motion</span><span class="mn-val">Slow-mo 0.3x speed · subtle drift</span></div>
-            <div class="mn-row"><span class="mn-key">✦ Effect</span><span class="mn-val">Sound wave animates with music beat</span></div>
-            <div class="mn-row"><span class="mn-key">😮 Face</span><span class="mn-val">Soft eyes · slight smile · emotional tear</span></div>
-          </div>
-          <div class="music-row">
-            <span class="music-chip">🎵 Emotional Piano – Free Music Archive</span>
-            <span class="music-chip">🎵 Heartfelt Strings – Incompetech</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- FRAME 5 -->
-      <div class="sb-frame">
-        <div class="sb-topbar">
-          <span class="sb-frame-id">FRAME_05 / Scene_Resolution</span>
-          <div class="sb-frame-tags">
-            <span class="sb-ftag" style="background:rgba(5,150,105,.15);color:#6ee7b7">Resolve</span>
-            <span class="sb-ftag" style="background:rgba(52,211,153,.15);color:#34d399">Calm</span>
-          </div>
-        </div>
-        <div class="sb-canvas">
-          <div class="scene-art">
-            <div class="s5-bg"></div>
-            <div class="s5-rings"></div>
-            <div class="s5-face5"></div>
-          </div>
-          <div class="sb-annot">
-            <span class="cam-badge cam-badge-light">🎥 MEDIUM WIDE</span>
-            <div class="m-arrow m-arrow-dark" style="bottom:20%;left:18%;">
-              <div class="m-arw-line" style="width:48px;margin-right:6px;"></div>
-              <span class="m-arw-label">PULL BACK</span>
-            </div>
-            <span class="typo-note typo-note-light" style="top:14px;left:14px;">Tt · Regular · 28pt · Spaced</span>
-          </div>
-        </div>
-        <div class="sb-info">
-          <div class="sb-info-top">
-            <div>
-              <div class="sb-scene-title">Resolution — Peace Found</div>
-              <div class="sb-scene-desc">Camera pulls back. Rings expand outward. Character centred and settled.</div>
-            </div>
-            <div class="pint-tag">📌 Ref: Zen Minimal Design</div>
-          </div>
-          <div class="sb-row2">
-            <span class="mood-chip" style="background:#ecfdf5;color:#065f46;">🌿 Resolved</span>
-            <div class="palette">
-              <span class="palette-label">Mood:</span>
-              <span class="swatch" style="background:#ecfdf5"></span>
-              <span class="swatch" style="background:#6ee7b7"></span>
-              <span class="swatch" style="background:#10b981"></span>
-              <span class="swatch" style="background:#065f46"></span>
-            </div>
-          </div>
-          <div class="motion-notes">
-            <div class="mn-row"><span class="mn-key">↗ Motion</span><span class="mn-val">Pull back · 1.5s · linear ease-out</span></div>
-            <div class="mn-row"><span class="mn-key">✦ Effect</span><span class="mn-val">Rings fade in sequence · 0.3s stagger</span></div>
-            <div class="mn-row"><span class="mn-key">😊 Face</span><span class="mn-val">Relaxed · soft smile · eyes calm</span></div>
-          </div>
-          <div class="music-row">
-            <span class="music-chip">🎵 Peaceful Resolution – Mixkit</span>
-            <span class="music-chip">🎵 Calm Ambient End – Bensound</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- FRAME 6 -->
-      <div class="sb-frame">
-        <div class="sb-topbar">
-          <span class="sb-frame-id">FRAME_06 / Scene_CTA</span>
-          <div class="sb-frame-tags">
-            <span class="sb-ftag" style="background:rgba(45,91,227,.2);color:#93b4ff">CTA</span>
-            <span class="sb-ftag" style="background:rgba(14,165,233,.2);color:#7dd3fc">End</span>
-          </div>
-        </div>
-        <div class="sb-canvas">
-          <div class="scene-art">
-            <div class="s6-bg"></div>
-            <div class="s6-face6"></div>
-            <div class="s6-btn">Try it Free →</div>
-          </div>
-          <div class="sb-annot">
-            <span class="cam-badge cam-badge-light">🎥 PRODUCT SHOT</span>
-            <div class="m-arrow m-arrow-dark" style="top:18%;right:18%;">
-              <span class="m-arw-label">BOUNCE ↓</span>
-            </div>
-            <span class="typo-note typo-note-light" style="bottom:14px;left:14px;">Tt · Bold · CTA · 16pt</span>
-          </div>
-        </div>
-        <div class="sb-info">
-          <div class="sb-info-top">
-            <div>
-              <div class="sb-scene-title">CTA — Action Moment</div>
-              <div class="sb-scene-desc">Product button bounces in. Character gestures toward it. Brand colours pulse.</div>
-            </div>
-            <div class="pint-tag">📌 Ref: SaaS Landing CTA</div>
-          </div>
-          <div class="sb-row2">
-            <span class="mood-chip" style="background:#eff6ff;color:#1d4ed8;">🚀 Confident</span>
-            <div class="palette">
-              <span class="palette-label">Mood:</span>
-              <span class="swatch" style="background:#eff6ff"></span>
-              <span class="swatch" style="background:#93c5fd"></span>
-              <span class="swatch" style="background:#2d5be3"></span>
-              <span class="swatch" style="background:#1e3a8a"></span>
-            </div>
-          </div>
-          <div class="motion-notes">
-            <div class="mn-row"><span class="mn-key">↗ Motion</span><span class="mn-val">Button scale 0→1 · bounce · 0.6s</span></div>
-            <div class="mn-row"><span class="mn-key">✦ Effect</span><span class="mn-val">Pulse glow on CTA · 1s loop</span></div>
-            <div class="mn-row"><span class="mn-key">😀 Face</span><span class="mn-val">Confident smile · pointing gesture</span></div>
-          </div>
-          <div class="music-row">
-            <span class="music-chip">🎵 Uplifting End – Pixabay Free</span>
-            <span class="music-chip">🎵 Brand Sting – YouTube Audio Library</span>
-          </div>
-        </div>
-      </div>
-
-    </div>
-  </section>
-
-  <!-- SECTION 4: JSON EXPORT -->
-  <section class="sec json-section" data-anim>
-    <div class="sec-hd">
-      <span class="sec-num">04</span>
-      <span class="sec-name">FIGMA IMPORT JSON — Copy & Paste into Plugin</span>
-      <span class="sec-line"></span>
-    </div>
-    <div class="json-box">
-      <div class="json-topbar">
-        <span class="json-title">storyboard_figma_export.json</span>
-        <div class="json-actions">
-          <button class="json-btn dl" onclick="downloadJSON()">⬇ Download</button>
-          <button class="json-btn copy" onclick="copyJSON()">⎘ Copy JSON</button>
-        </div>
-      </div>
-      <pre id="json-output"><span class="j-comment">// Paste this into: Figma → Plugins → JSON to Figma (or similar plugin)</span>
-{
-  <span class="j-key">"storyboard"</span>: {
-    <span class="j-key">"project"</span>: <span class="j-str">"AI Video Storyboard"</span>,
-    <span class="j-key">"style"</span>: <span class="j-str">"SaaS / Clean UI"</span>,
-    <span class="j-key">"canvas_size"</span>: { <span class="j-key">"w"</span>: <span class="j-num">1920</span>, <span class="j-key">"h"</span>: <span class="j-num">1080</span> },
-    <span class="j-key">"pinterest_ref"</span>: <span class="j-str">"https://pinterest.com/your-board"</span>,
-    <span class="j-key">"emotion_arc"</span>: [<span class="j-str">"calm"</span>, <span class="j-str">"excited"</span>, <span class="j-str">"tense"</span>, <span class="j-str">"vulnerable"</span>, <span class="j-str">"resolved"</span>, <span class="j-str">"confident"</span>],
-    <span class="j-key">"frames"</span>: [
-      {
-        <span class="j-key">"id"</span>: <span class="j-str">"FRAME_01"</span>,
-        <span class="j-key">"scene"</span>: <span class="j-str">"Hook — Introduce the World"</span>,
-        <span class="j-key">"camera"</span>: <span class="j-str">"WIDE SHOT"</span>,
-        <span class="j-key">"emotion"</span>: <span class="j-str">"calm → curious"</span>,
-        <span class="j-key">"character_expression"</span>: <span class="j-str">"neutral, soft eyes, slight curiosity"</span>,
-        <span class="j-key">"typography"</span>: { <span class="j-key">"font"</span>: <span class="j-str">"Instrument Serif"</span>, <span class="j-key">"size"</span>: <span class="j-num">48</span>, <span class="j-key">"weight"</span>: <span class="j-str">"Bold"</span> },
-        <span class="j-key">"motion"</span>: { <span class="j-key">"type"</span>: <span class="j-str">"zoom-in"</span>, <span class="j-key">"duration"</span>: <span class="j-num">2</span>, <span class="j-key">"easing"</span>: <span class="j-str">"ease-out"</span> },
-        <span class="j-key">"color_palette"</span>: [<span class="j-str">"#302b63"</span>, <span class="j-str">"#24243e"</span>, <span class="j-str">"#f9c784"</span>, <span class="j-str">"#c4b5fd"</span>],
-        <span class="j-key">"pinterest_tag"</span>: <span class="j-str">"Dark UI Hero"</span>,
-        <span class="j-key">"music"</span>: [
-          { <span class="j-key">"title"</span>: <span class="j-str">"Lofi Chill"</span>, <span class="j-key">"source"</span>: <span class="j-str">"YouTube Audio Library"</span>, <span class="j-key">"free"</span>: <span class="j-kw">true</span> },
-          { <span class="j-key">"title"</span>: <span class="j-str">"Soft Ambient Intro"</span>, <span class="j-key">"source"</span>: <span class="j-str">"Kevin MacLeod"</span>, <span class="j-key">"free"</span>: <span class="j-kw">true</span> }
-        ],
-        <span class="j-key">"figma_layers"</span>: [
-          { <span class="j-key">"name"</span>: <span class="j-str">"BG/Gradient"</span>, <span class="j-key">"type"</span>: <span class="j-str">"RECTANGLE"</span> },
-          { <span class="j-key">"name"</span>: <span class="j-str">"Character/Face"</span>, <span class="j-key">"type"</span>: <span class="j-str">"ELLIPSE"</span> },
-          { <span class="j-key">"name"</span>: <span class="j-str">"Annotation/CameraAngle"</span>, <span class="j-key">"type"</span>: <span class="j-str">"TEXT"</span> },
-          { <span class="j-key">"name"</span>: <span class="j-str">"Annotation/MotionArrow"</span>, <span class="j-key">"type"</span>: <span class="j-str">"VECTOR"</span> },
-          { <span class="j-key">"name"</span>: <span class="j-str">"Annotation/Typography"</span>, <span class="j-key">"type"</span>: <span class="j-str">"TEXT"</span> },
-          { <span class="j-key">"name"</span>: <span class="j-str">"Note/PinterestRef"</span>, <span class="j-key">"type"</span>: <span class="j-str">"TEXT"</span> }
-        ]
-      },
-      <span class="j-comment">// ... FRAME_02 through FRAME_06 follow same schema ...</span>
-      {
-        <span class="j-key">"id"</span>: <span class="j-str">"FRAME_06"</span>,
-        <span class="j-key">"scene"</span>: <span class="j-str">"CTA — Action Moment"</span>,
-        <span class="j-key">"camera"</span>: <span class="j-str">"PRODUCT SHOT"</span>,
-        <span class="j-key">"emotion"</span>: <span class="j-str">"confident"</span>,
-        <span class="j-key">"character_expression"</span>: <span class="j-str">"confident smile, pointing gesture"</span>,
-        <span class="j-key">"typography"</span>: { <span class="j-key">"font"</span>: <span class="j-str">"Plus Jakarta Sans"</span>, <span class="j-key">"size"</span>: <span class="j-num">16</span>, <span class="j-key">"weight"</span>: <span class="j-str">"Bold"</span> },
-        <span class="j-key">"motion"</span>: { <span class="j-key">"type"</span>: <span class="j-str">"bounce-in"</span>, <span class="j-key">"duration"</span>: <span class="j-num">0.6</span>, <span class="j-key">"easing"</span>: <span class="j-str">"spring"</span> },
-        <span class="j-key">"color_palette"</span>: [<span class="j-str">"#eff6ff"</span>, <span class="j-str">"#93c5fd"</span>, <span class="j-str">"#2d5be3"</span>, <span class="j-str">"#1e3a8a"</span>],
-        <span class="j-key">"pinterest_tag"</span>: <span class="j-str">"SaaS Landing CTA"</span>,
-        <span class="j-key">"music"</span>: [
-          { <span class="j-key">"title"</span>: <span class="j-str">"Uplifting End"</span>, <span class="j-key">"source"</span>: <span class="j-str">"Pixabay"</span>, <span class="j-key">"free"</span>: <span class="j-kw">true</span> }
-        ]
-      }
-    ]
-  },
-  <span class="j-key">"webhook_delivery"</span>: {
-    <span class="j-key">"method"</span>: <span class="j-str">"POST"</span>,
-    <span class="j-key">"content_type"</span>: <span class="j-str">"application/json"</span>,
-    <span class="j-key">"payload_includes"</span>: [<span class="j-str">"storyboard"</span>, <span class="j-str">"music_list"</span>, <span class="j-str">"emotion_map"</span>, <span class="j-str">"figma_json"</span>]
-  }
-}</pre>
-    </div>
-  </section>
-
-  <!-- SECTION 5: HOW TO USE -->
-  <section class="sec" data-anim>
-    <div class="sec-hd">
-      <span class="sec-num">05</span>
-      <span class="sec-name">HOW TO USE IN FIGMA</span>
-      <span class="sec-line"></span>
-    </div>
-    <div class="steps-grid">
-      <div class="step-card" style="--sc:var(--a1)"><div class="step-num">1</div><div class="step-body"><div class="step-title">Run the n8n Workflow</div><div class="step-desc">POST your script + screenshots to your webhook URL. The workflow runs all nodes and delivers the JSON bundle to your custom endpoint.</div></div></div>
-      <div class="step-card" style="--sc:var(--a2)"><div class="step-num">2</div><div class="step-body"><div class="step-title">Copy the Figma JSON</div><div class="step-desc">Grab the <code>figma_json</code> field from the webhook response (or copy it above). This contains all frames with layers, annotations and notes.</div></div></div>
-      <div class="step-card" style="--sc:var(--a4)"><div class="step-num">3</div><div class="step-body"><div class="step-title">Install "JSON to Figma" Plugin</div><div class="step-desc">In Figma, go to Plugins → search "JSON to Figma" or "Figma Tokens". Paste the JSON and click Import — frames auto-generate.</div></div></div>
-      <div class="step-card" style="--sc:#f97316"><div class="step-num">4</div><div class="step-body"><div class="step-title">Check Emotion + Music List</div><div class="step-desc">The <code>music_list</code> in the bundle gives you 5 free YouTube tracks per scene, matched to the detected emotion arc of your script.</div></div></div>
-      <div class="step-card" style="--sc:var(--a5)"><div class="step-num">5</div><div class="step-body"><div class="step-title">Review Pinterest Style Refs</div><div class="step-desc">Each frame includes a Pinterest tag pulled from your board. Use these as visual style anchors when creating the final animation assets.</div></div></div>
-      <div class="step-card" style="--sc:var(--a6)"><div class="step-num">6</div><div class="step-body"><div class="step-title">Hand Off to Animator</div><div class="step-desc">Each frame has motion type, duration, easing, face expression guide, camera shot, and typography spec — everything your animator needs.</div></div></div>
-    </div>
-  </section>
-
-</div>
-
-<script>
-// Scroll animations
-const obs = new IntersectionObserver(entries => {
-  entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('visible'); });
-},{threshold:0.08});
-document.querySelectorAll('[data-anim]').forEach(el => obs.observe(el));
-
-// Copy JSON
-function copyJSON(){
-  const raw = document.getElementById('json-output').innerText.replace(/\/\/.*/g,'').trim();
-  navigator.clipboard.writeText(raw).then(()=>showToast('✓ JSON copied to clipboard'));
-}
-function downloadJSON(){
-  const raw = document.getElementById('json-output').innerText.replace(/\/\/.*/g,'').trim();
-  const blob = new Blob([raw],{type:'application/json'});
-  const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
-  a.download = 'storyboard_figma_export.json'; a.click();
-  showToast('⬇ Download started');
-}
-function showToast(msg){
-  const t = document.getElementById('toast'); t.textContent = msg;
-  t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2200);
-}
-</script>
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            loadFrames();
+            loadMusic();
+            loadFigmaJson();
+        });
+    </script>
 </body>
 </html>
